@@ -2,7 +2,7 @@ import './assets/main.scss'
 
 import { createApp } from 'vue'
 import App from './App.vue'
-import VueKonva from 'vue-konva';
+import VueKonva from 'vue-konva'
 import router from './router'
 
 const app = createApp(App)

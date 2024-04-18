@@ -6,7 +6,7 @@ import { maxZIndex } from '@/composables/maxZIndex'
 const width = window.innerWidth
 const height = window.innerHeight
 
-const stageSize = {
+const stageConfig = {
   width: width,
   height: height
 }
@@ -88,7 +88,11 @@ const handleStageMouseDown = (e: any) => {
 </script>
 
 <template>
-  <v-stage :config="stageSize" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown">
+  <v-stage
+    :config="stageConfig"
+    @mousedown="handleStageMouseDown"
+    @touchstart="handleStageMouseDown"
+  >
     <v-layer>
       <grid-block :key="id" v-for="(block, id) in initialBlocks" v-bind="block" />
       <v-transformer ref="transformer" :config="{ rotateEnabled: false, flipEnabled: false }" />

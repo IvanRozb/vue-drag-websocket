@@ -31,6 +31,20 @@ const handleDragEnd = (e: any) => {
   setCursor(e, 'default')
 }
 
+const handleDrag = (e: any) => {
+  const target = e.target
+
+  const calculateNextStepValue = (value: number) => {
+    const step = 50
+    return Math.round(value / step) * step
+  }
+
+  const [newX, newY] = [target.x(), target.y()].map(calculateNextStepValue)
+
+  target.x(newX)
+  target.y(newY)
+}
+
 const handleMouseEnter = (e: any) => {
   setCursor(e, 'pointer')
 }
@@ -50,6 +64,7 @@ const handleTransformEnd = (e: {
 <template>
   <v-group
     :config="{ zIndex, draggable: true, cursor: 'pointer' }"
+    @dragmove="handleDrag"
     @dragstart="handleDragStart"
     @dragend="handleDragEnd"
     @mouseenter="handleMouseEnter"

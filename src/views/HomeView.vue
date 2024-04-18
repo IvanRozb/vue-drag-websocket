@@ -22,28 +22,12 @@ const defaultProps = {
 
 const initialBlocks = ['red', 'green', 'blue', 'yellow', 'orange'].map((color, index) => ({
   ...defaultProps,
-  id: index,
+  id: index + 1,
   color
 }))
 
 const selectId = ref(-1)
 const transformer = ref<any | null>(null)
-
-const handleTransformEnd = (e: {
-  target: { x: Function; y: Function; rotation: Function; scaleX: Function; scaleY: Function }
-}) => {
-  // shape is transformed, let us save new attrs back to the node
-  // find element in our state
-  const rect = initialBlocks.find((r) => r.id === selectId.value)
-  if (!rect) return
-
-  // update the state
-  rect.x = e.target.x()
-  rect.y = e.target.y()
-  rect.rotation = e.target.rotation()
-  rect.scaleX = e.target.scaleX()
-  rect.scaleY = e.target.scaleY()
-}
 
 const updateTransformer = () => {
   if (!transformer.value) return
@@ -52,7 +36,7 @@ const updateTransformer = () => {
   const transformerNode = transformer.value.getNode()
   const stage = transformerNode.getStage()
 
-  const selectedNode = stage.findOne('.'+selectId.value)
+  const selectedNode = stage.findOne('.' + selectId.value)
   // do nothing if selected node is already attached
   if (selectedNode === transformerNode.node()) {
     return
@@ -97,7 +81,7 @@ const handleStageMouseDown = (e: any) => {
         v-bind="block"
         @transformend="handleTransformEnd"
       />
-      <v-transformer ref="transformer" :config="{rotateEnabled: false}"/>
+      <v-transformer ref="transformer" :config="{ rotateEnabled: false }" />
     </v-layer>
   </v-stage>
 </template>

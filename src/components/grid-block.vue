@@ -1,22 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { maxZIndex } from '@/composables/maxZIndex'
 
-defineProps<{
+const props = defineProps<{
   id: number
+  x: number
+  y: number
   width: number
   height: number
   color: string
 }>()
 
-const emit = defineEmits<{
-  (
-    name: 'transformend',
-    e: {
-      target: { x: Function; y: Function; rotation: Function; scaleX: Function; scaleY: Function }
-    }
-  ): void
-}>()
+const config = reactive({ ...props })
 
 const isDragging = ref(false)
 const zIndex = ref(0)
@@ -30,22 +25,35 @@ const handleDragStart = () => {
 const handleDragEnd = () => {
   isDragging.value = false
 }
+
+const handleTransformEnd = (e: {
+  target: { x: Function; y: Function; rotation: Function; scaleX: Function; scaleY: Function }
+}) => {
+  config.x = e.target.x()
+  config.y = e.target.y()
+}
 </script>
 
 <template>
-  <v-group :config="{ zIndex }">
+  <v-group :config="{ zIndex,
+        draggable: true, }">
     <v-rect
       @dragstart="handleDragStart"
       @dragend="handleDragEnd"
       :config="{
-        id,
+        ...config,
         name: id.toString(),
-        width,
-        height,
-        draggable: true,
-        fill: color
+        fill: color,
       }"
-      @transformend="(e: any) => emit('transformend', e)"
+      @transform="handleTransformEnd"
+    >
+    </v-rect>
+    <v-text :config="{
+      text: id.toString(),
+      x: config.x + 10,
+      y: config.y + 10,
+      fontSize: 30,
+    }"
     />
   </v-group>
 </template>

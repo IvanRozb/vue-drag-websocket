@@ -20,10 +20,9 @@ const defaultProps = {
   scaleY: 1
 }
 
-const initialBlocks = ['red', 'green', 'blue', 'yellow', 'orange'].map((color, index) => ({
+const initialBlocks = Array.from({ length: 5 }).map((_, index) => ({
   ...defaultProps,
-  id: index + 1,
-  color
+  id: index + 1
 }))
 
 const selectId = ref(-1)
@@ -75,12 +74,7 @@ const handleStageMouseDown = (e: any) => {
 <template>
   <v-stage :config="stageSize" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown">
     <v-layer>
-      <grid-block
-        :key="id"
-        v-for="(block, id) in initialBlocks"
-        v-bind="block"
-        @transformend="handleTransformEnd"
-      />
+      <grid-block :key="id" v-for="(block, id) in initialBlocks" v-bind="block" />
       <v-transformer ref="transformer" :config="{ rotateEnabled: false }" />
     </v-layer>
   </v-stage>

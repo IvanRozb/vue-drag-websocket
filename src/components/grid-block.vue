@@ -8,7 +8,6 @@ const props = defineProps<{
   y: number
   width: number
   height: number
-  color: string
 }>()
 
 const config = reactive({ ...props })
@@ -35,25 +34,26 @@ const handleTransformEnd = (e: {
 </script>
 
 <template>
-  <v-group :config="{ zIndex,
-        draggable: true, }">
+  <v-group :config="{ zIndex, draggable: true }">
     <v-rect
       @dragstart="handleDragStart"
       @dragend="handleDragEnd"
       :config="{
         ...config,
         name: id.toString(),
-        fill: color,
+        strokeWidth: 1,
+        stroke: 'black'
       }"
       @transform="handleTransformEnd"
     >
     </v-rect>
-    <v-text :config="{
-      text: id.toString(),
-      x: config.x + 10,
-      y: config.y + 10,
-      fontSize: 30,
-    }"
+    <v-text
+      :config="{
+        text: id.toString(),
+        x: config.x + 10,
+        y: config.y + 10,
+        fontSize: 30
+      }"
     />
   </v-group>
 </template>

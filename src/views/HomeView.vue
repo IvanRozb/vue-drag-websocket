@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import GridBlock from '@/components/grid-block.vue'
+import { maxZIndex } from '@/composables/maxZIndex'
 
 const width = window.innerWidth
 const height = window.innerHeight
@@ -21,18 +22,17 @@ const defaultProps = {
 }
 
 const generateRandomColor = () => {
-  const r: number = Math.floor(Math.random() * 256);
-  const g: number = Math.floor(Math.random() * 256);
-  const b: number = Math.floor(Math.random() * 256);
+  const generateRandomRGBValue = () => Math.floor(Math.random() * 256)
 
-  return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
+  const [r, g, b] = Array.from({ length: 3 }).map(() => generateRandomRGBValue())
+
+  return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`
 }
-
 
 const initialBlocks = Array.from({ length: 5 }).map((_, index) => ({
   ...defaultProps,
   id: index + 1,
-  fill: generateRandomColor(),
+  fill: generateRandomColor()
 }))
 
 const selectId = ref(-1)
@@ -45,7 +45,7 @@ const updateTransformer = () => {
   const transformerNode = transformer.value.getNode()
   const stage = transformerNode.getStage()
 
-  const selectedNode = stage.findOne('.' + selectId.value)
+  const selectedNode = stage.findOne('.' + selectId.value.toString())
   // do nothing if selected node is already attached
   if (selectedNode === transformerNode.node()) {
     return
@@ -76,7 +76,13 @@ const handleStageMouseDown = (e: any) => {
   // find clicked rect by its id
   const id = e.target.id()
   const rect = initialBlocks.find((r) => r.id === id)
+
+  if (rect) {
+    e.target.getParent()?.setAttr('zIndex', maxZIndex.value)
+  }
+
   selectId.value = rect ? id : -1
+
   updateTransformer()
 }
 </script>
@@ -85,7 +91,7 @@ const handleStageMouseDown = (e: any) => {
   <v-stage :config="stageSize" @mousedown="handleStageMouseDown" @touchstart="handleStageMouseDown">
     <v-layer>
       <grid-block :key="id" v-for="(block, id) in initialBlocks" v-bind="block" />
-      <v-transformer ref="transformer" :config="{ rotateEnabled: false }" />
+      <v-transformer ref="transformer" :config="{ rotateEnabled: false, flipEnabled: false }" />
     </v-layer>
   </v-stage>
 </template>

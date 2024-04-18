@@ -13,17 +13,30 @@ const props = defineProps<{
 
 const config = reactive({ ...props })
 
-const isDragging = ref(false)
 const zIndex = ref(0)
 
-const handleDragStart = () => {
-  isDragging.value = true
-  zIndex.value = maxZIndex.value + 1
-  maxZIndex.value++
+const setCursor = (e: any, cursor: string) => {
+  const styles = e.target.getStage().container().style
+  styles.cursor = cursor
 }
 
-const handleDragEnd = () => {
-  isDragging.value = false
+const handleDragStart = (e: any) => {
+  zIndex.value = maxZIndex.value + 1
+  maxZIndex.value++
+
+  setCursor(e, 'grab')
+}
+
+const handleDragEnd = (e: any) => {
+  setCursor(e, 'default')
+}
+
+const handleMouseEnter = (e: any) => {
+  setCursor(e, 'pointer')
+}
+
+const handleMouseLeave = (e: any) => {
+  setCursor(e, 'default')
 }
 
 const handleTransformEnd = (e: {
@@ -35,10 +48,14 @@ const handleTransformEnd = (e: {
 </script>
 
 <template>
-  <v-group :config="{ zIndex, draggable: true }">
+  <v-group
+    :config="{ zIndex, draggable: true, cursor: 'pointer' }"
+    @dragstart="handleDragStart"
+    @dragend="handleDragEnd"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
+  >
     <v-rect
-      @dragstart="handleDragStart"
-      @dragend="handleDragEnd"
       :config="{
         ...config,
         name: id.toString(),
@@ -53,7 +70,9 @@ const handleTransformEnd = (e: {
         text: id.toString(),
         x: config.x + 10,
         y: config.y + 10,
-        fontSize: 30
+        fontSize: 30,
+        stroke: 'white',
+        fill: 'white'
       }"
     />
   </v-group>

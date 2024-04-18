@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
+import GridBlock from '@/components/grid-block.vue'
 
 const width = window.innerWidth
 const height = window.innerHeight
@@ -8,28 +9,36 @@ const stageSize = reactive({
   width: width,
   height: height
 })
-const isDragging = ref(false)
 
-const handleDragStart = () => {
-  isDragging.value = true
-}
-const handleDragEnd = () => {
-  isDragging.value = false
-}
+const initialBlocks = [
+  {
+    id: 1,
+    width: 300,
+    height: 500
+  },
+  {
+    width: 300,
+    height: 500
+  },
+  {
+    width: 300,
+    height: 500
+  },
+  {
+    width: 300,
+    height: 500
+  }
+]
 </script>
 
 <template>
   <v-stage ref="stage" :config="stageSize">
     <v-layer ref="layer">
-      <v-rect
-        @dragstart="handleDragStart"
-        @dragend="handleDragEnd"
-        :config="{
-          width: 300,
-          height: 500,
-          draggable: true,
-          fill: isDragging ? 'green' : 'black'
-        }"
+      <grid-block
+        :key="id"
+        v-for="(block, id) in initialBlocks"
+        :width="block.width"
+        :height="block.height"
       />
     </v-layer>
   </v-stage>

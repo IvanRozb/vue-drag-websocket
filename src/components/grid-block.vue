@@ -3,10 +3,21 @@ import { ref } from 'vue'
 import { maxZIndex } from '@/composables/maxZIndex'
 
 defineProps<{
+  id: number
   width: number
   height: number
   color: string
 }>()
+
+const emit = defineEmits<{
+  (
+    name: 'transformend',
+    e: {
+      target: { x: Function; y: Function; rotation: Function; scaleX: Function; scaleY: Function }
+    }
+  ): void
+}>()
+
 const isDragging = ref(false)
 const zIndex = ref(0)
 
@@ -22,16 +33,19 @@ const handleDragEnd = () => {
 </script>
 
 <template>
-  <v-layer ref="layer" :config="{ zIndex }">
+  <v-group :config="{ zIndex }">
     <v-rect
       @dragstart="handleDragStart"
       @dragend="handleDragEnd"
       :config="{
+        id,
+        name: id.toString(),
         width,
         height,
         draggable: true,
         fill: color
       }"
+      @transformend="(e: any) => emit('transformend', e)"
     />
-  </v-layer>
+  </v-group>
 </template>

@@ -12,34 +12,36 @@ const stageSize = reactive({
 
 const initialBlocks = [
   {
-    id: 1,
     width: 300,
-    height: 500
+    height: 500,
+    color: 'red'
   },
   {
     width: 300,
-    height: 500
+    height: 500,
+    color: 'green'
   },
   {
     width: 300,
-    height: 500
+    height: 500,
+    color: 'blue'
   },
   {
     width: 300,
-    height: 500
+    height: 500,
+    color: 'yellow'
   }
 ]
 </script>
 
 <template>
   <v-stage ref="stage" :config="stageSize">
-    <v-layer ref="layer">
-      <grid-block
-        :key="id"
-        v-for="(block, id) in initialBlocks"
-        :width="block.width"
-        :height="block.height"
-      />
-    </v-layer>
+    <grid-block
+      :key="id"
+      v-for="(block, id) in initialBlocks"
+      :width="block.width"
+      :height="block.height"
+      :color="block.color"
+    />
   </v-stage>
 </template>

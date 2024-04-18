@@ -8,6 +8,7 @@ const props = defineProps<{
   y: number
   width: number
   height: number
+  fill: string
 }>()
 
 const config = reactive({ ...props })

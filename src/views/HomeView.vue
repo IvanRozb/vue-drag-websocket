@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import GridBlock from '@/components/grid-block.vue'
 
 const width = window.innerWidth
 const height = window.innerHeight
 
-const stageSize = reactive({
+const stageSize = {
   width: width,
   height: height
-})
+}
 
 const defaultProps = {
   width: 300,
@@ -20,9 +20,19 @@ const defaultProps = {
   scaleY: 1
 }
 
+const generateRandomColor = () => {
+  const r: number = Math.floor(Math.random() * 256);
+  const g: number = Math.floor(Math.random() * 256);
+  const b: number = Math.floor(Math.random() * 256);
+
+  return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`;
+}
+
+
 const initialBlocks = Array.from({ length: 5 }).map((_, index) => ({
   ...defaultProps,
-  id: index + 1
+  id: index + 1,
+  fill: generateRandomColor(),
 }))
 
 const selectId = ref(-1)

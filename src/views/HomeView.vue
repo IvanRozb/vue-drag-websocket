@@ -35,7 +35,10 @@ const localItems = getLocalStorageItem('items')
 const items = reactive(localItems ?? generateItems())
 
 const selectId = ref('-1')
+const lastDeletedItem = ref<any | null>(null)
+
 const transformer = ref<any | null>(null)
+const stageRef = ref<any | null>(null)
 
 const updateTransformer = () => {
   if (!transformer.value) return
@@ -97,13 +100,15 @@ const handleStageMouseDown = (e: any) => {
   updateTransformer()
 }
 
-const setCursor = (e: any, cursor: string) => {
-  const styles = e.target.getStage().container().style
+const setCursor = (cursor: string) => {
+  if (!stageRef.value) return
+
+  const styles = stageRef.value.getNode().container().style
   styles.cursor = cursor
 }
 
 const handleDragStart = (e: any) => {
-  setCursor(e, 'grab')
+  setCursor('grab')
   blockToTheTop(getTargetParent(e.target, 'Group'))
 }
 
@@ -138,11 +143,11 @@ const handleDrag = (e: any) => {
 }
 
 const handleMouseEnter = (e: any) => {
-  setCursor(e, 'pointer')
+  setCursor('pointer')
 }
 
 const handleMouseLeave = (e: any) => {
-  setCursor(e, 'default')
+  setCursor('default')
 }
 
 const handleTransform = (e: any) => {
@@ -197,14 +202,27 @@ const boundTransformBoxFunc = (oldBoundBox: any, newBoundBox: any) => {
   return res
 }
 
-const removeGroup = (groupId: string) => {
+const removeItem = (groupId: string) => {
   const index = items.findIndex((item: any) => item.id === groupId)
   if (index === -1) return
 
-  items.splice(index, 1)
+  const [deletedItem] = items.splice(index, 1)
+  lastDeletedItem.value = { item: deletedItem, index }
 
   const transformerNode = transformer.value.getNode()
+  if (!transformerNode) return
+
   transformerNode.nodes([])
+
+  const stage = transformerNode.getStage()
+  setCursor('default')
+}
+
+const restoreLastDeletedItem = () => {
+  if (!lastDeletedItem.value) return
+
+  items.splice(lastDeletedItem.value.index, 0, lastDeletedItem.value.item)
+  lastDeletedItem.value = null
 }
 
 watch(items, () => {
@@ -214,7 +232,22 @@ watch(items, () => {
 
 <template>
   <div class="grid" :style="{ '--step': `${step}px` }">
+    <svg
+      v-if="lastDeletedItem"
+      @click="restoreLastDeletedItem"
+      class="grid__return grid__info"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 48 48"
+    >
+      <path d="M0 0h48v48H0z" fill="none" />
+      <g id="Shopicon">
+        <path
+          d="M10,22v2c0,7.72,6.28,14,14,14s14-6.28,14-14s-6.28-14-14-14h-6.662l3.474-4.298l-3.11-2.515L10.577,12l7.125,8.813   l3.11-2.515L17.338,14H24c5.514,0,10,4.486,10,10s-4.486,10-10,10s-10-4.486-10-10v-2H10z"
+        />
+      </g>
+    </svg>
     <v-stage
+      ref="stageRef"
       :config="stageConfig"
       @mousedown="handleStageMouseDown"
       @touchstart="handleStageMouseDown"
@@ -231,7 +264,7 @@ watch(items, () => {
             scaleX: block.scaleX,
             scaleY: block.scaleY
           }"
-          @dblclick="removeGroup(block.id)"
+          @dblclick="removeItem(block.id)"
           @dragmove="handleDrag"
           @dragstart="handleDragStart"
           @dragend="handleDragEnd"
@@ -263,7 +296,7 @@ watch(items, () => {
         />
       </v-layer>
     </v-stage>
-    <div class="agenda">To delete an item, just double-click on it.</div>
+    <div class="grid__agenda grid__info">To delete an item, just double-click on it.</div>
   </div>
 </template>
 
@@ -273,17 +306,34 @@ watch(items, () => {
     repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
   background-size: var(--step) var(--step);
 
-  .agenda {
+  &__info {
     position: absolute;
     top: 0;
-    right: 0;
     z-index: 10;
-
-    padding: 20px 12px;
 
     background-color: white;
     border: 1px solid black;
+  }
 
+  &__return {
+    left: 0;
+
+    width: calc(var(--step) * 1);
+    height: calc(var(--step) * 1);
+
+    cursor: pointer;
+
+    &:hover {
+      stroke: green;
+      fill: green;
+    }
+  }
+
+  &__agenda {
+    right: 0;
+    padding: 20px 12px;
+
+    font-family: 'Roboto Light', sans-serif;
     font-size: 1.25rem;
   }
 }

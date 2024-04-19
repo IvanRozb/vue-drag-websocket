@@ -17,10 +17,13 @@ const defaultProps = {
   x: 10,
   y: 10
 }
+const step = 50
 
 const generateItems = () =>
   Array.from({ length: 5 }).map((_, index) => ({
     ...defaultProps,
+    x: defaultProps.x + (index % 3) * (step + defaultProps.width),
+    y: defaultProps.y + (step + defaultProps.height) * Math.floor(index / 3),
     id: 'node-' + index,
     text: index + 1,
     fill: Konva.Util.getRandomColor()
@@ -118,7 +121,6 @@ const handleDrag = (e: any) => {
   const target = e.target
 
   const calculateNextStepValue = (value: number) => {
-    const step = 50
     return Math.round(value / step) * step
   }
 

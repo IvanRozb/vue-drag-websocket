@@ -1,5 +1,5 @@
 <template>
-  <svg class="return" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <svg class="restore" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
     <path d="M0 0h48v48H0z" fill="none" />
     <g id="Shopicon">
       <path
@@ -10,7 +10,7 @@
 </template>
 
 <style scoped lang="scss">
-.return {
+.restore {
   left: 0;
 
   width: calc(var(--step) * 1);

@@ -1,5 +1,5 @@
-<script lang="ts" setup>
-import { onMounted, reactive, ref, watch } from 'vue'
+<script setup lang="ts">
+import { reactive, ref, watch } from 'vue'
 import Konva from 'konva'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorage'
 import TextNode from '@/components/text-node.vue'
@@ -69,7 +69,7 @@ const getTargetParent = (targetNode: any, targetClass: string) => {
 const blockToTheTop = (target: any) => {
   const dragItemId = target.id()
 
-  const item = items.find((i) => i.id === dragItemId)
+  const item = items.find((i: any) => i.id === dragItemId)
   if (!item) return
 
   const index = items.indexOf(item)
@@ -89,7 +89,7 @@ const handleStageMouseDown = (e: any) => {
 
   const target = getTargetParent(e.target, 'Group')
   const id = target.id()
-  const rect = items.find((r) => r.id === id)
+  const rect = items.find((r: any) => r.id === id)
 
   selectId.value = rect ? id : -1
 
@@ -111,7 +111,7 @@ const handleDragEnd = (e: any) => {
   const target = getTargetParent(e.target, 'Group')
   const draggedItemId = target.attrs.id
 
-  const draggedItemIndex = items.findIndex((r) => r.id === draggedItemId)
+  const draggedItemIndex = items.findIndex((r: any) => r.id === draggedItemId)
 
   if (draggedItemIndex !== -1) {
     items[draggedItemIndex].x = target.attrs.x
@@ -159,7 +159,7 @@ const handleTransformEnd = (e: any) => {
   const target = e.target
   const draggedItemId = target.id()
 
-  const draggedItemIndex = items.findIndex((r) => r.id === draggedItemId)
+  const draggedItemIndex = items.findIndex((r: any) => r.id === draggedItemId)
   if (draggedItemIndex === -1) return
 
   items[draggedItemIndex].scaleX = target.attrs.scaleX
@@ -184,7 +184,6 @@ const boundTransformBoxFunc = (oldBoundBox: any, newBoundBox: any) => {
 
   const dimensions = ['width', 'height', 'x', 'y']
   dimensions.forEach(fillDimension)
-
   const isOut =
     res.x < 0 ||
     res.y < 0 ||
@@ -196,6 +195,16 @@ const boundTransformBoxFunc = (oldBoundBox: any, newBoundBox: any) => {
   }
 
   return res
+}
+
+const removeGroup = (groupId: string) => {
+  const index = items.findIndex((item: any) => item.id === groupId)
+  if (index === -1) return
+
+  items.splice(index, 1)
+
+  const transformerNode = transformer.value.getNode()
+  transformerNode.nodes([])
 }
 
 watch(items, () => {
@@ -222,6 +231,7 @@ watch(items, () => {
             scaleX: block.scaleX,
             scaleY: block.scaleY
           }"
+          @dblclick="removeGroup(block.id)"
           @dragmove="handleDrag"
           @dragstart="handleDragStart"
           @dragend="handleDragEnd"
@@ -248,12 +258,12 @@ watch(items, () => {
           :config="{
             rotateEnabled: false,
             flipEnabled: false,
-            // anchorDragBoundFunc: dragTransformBounce
             boundBoxFunc: boundTransformBoxFunc
           }"
         />
       </v-layer>
     </v-stage>
+    <div class="agenda">To delete an item, just double-click on it.</div>
   </div>
 </template>
 
@@ -262,5 +272,19 @@ watch(items, () => {
   background-image: repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%),
     repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
   background-size: var(--step) var(--step);
+
+  .agenda {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+
+    padding: 20px 12px;
+
+    background-color: white;
+    border: 1px solid black;
+
+    font-size: 1.25rem;
+  }
 }
 </style>

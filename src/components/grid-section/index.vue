@@ -217,7 +217,7 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
 
 <template>
   <div class="grid" :style="{ '--step': `${step}px` }">
-    <GridSectionInfoRestore v-if="lastDeletedItem" @click="restoreLastDeletedItem" class="info" />
+    <grid-section-info-restore v-if="lastDeletedItem" @click="restoreLastDeletedItem" class="info" />
     <v-stage
       ref="stageRef"
       :config="stageConfig"
@@ -256,7 +256,7 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
             }"
           >
           </v-rect>
-          <TextNode :id="block.id" :text="block.text" />
+          <text-node :id="block.id" :text="block.text" />
         </v-group>
         <v-transformer
           ref="transformerRef"
@@ -268,7 +268,7 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
         />
       </v-layer>
     </v-stage>
-    <GridSectionInfoAgenda class="info" />
+    <grid-section-info-agenda class="info" />
   </div>
 </template>
 

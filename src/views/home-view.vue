@@ -3,5 +3,5 @@ import GridSection from '@/components/grid-section/index.vue'
 </script>
 
 <template>
-  <GridSection />
+  <grid-section />
 </template>

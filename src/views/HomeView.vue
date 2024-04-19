@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
-import GridBlock from '@/components/grid-block.vue'
-import { maxZIndex } from '@/composables/maxZIndex'
+import { ref, watch } from 'vue'
+import Konva from 'konva'
 
 const width = window.innerWidth
 const height = window.innerHeight
@@ -13,39 +12,28 @@ const stageConfig = {
 
 const defaultProps = {
   width: 300,
-  height: 100,
-  x: 100,
-  y: 100,
-  rotation: 0,
-  scaleX: 1,
-  scaleY: 1
+  height: 100
 }
 
-const generateRandomColor = () => {
-  const generateRandomRGBValue = () => Math.floor(Math.random() * 256)
+const initialBlocks = ref(
+  Array.from({ length: 5 }).map((_, index) => ({
+    ...defaultProps,
+    id: 'node-' + index,
+    text: index + 1,
+    fill: Konva.Util.getRandomColor()
+  }))
+)
 
-  const [r, g, b] = Array.from({ length: 3 }).map(() => generateRandomRGBValue())
-
-  return `#${r.toString(16)}${g.toString(16)}${b.toString(16)}`
-}
-
-const initialBlocks = Array.from({ length: 5 }).map((_, index) => ({
-  ...defaultProps,
-  id: index + 1,
-  fill: generateRandomColor()
-}))
-
-const selectId = ref(-1)
+const selectId = ref('-1')
 const transformer = ref<any | null>(null)
 
 const updateTransformer = () => {
   if (!transformer.value) return
-
-  // here we need to manually attach or detach Transformer node
   const transformerNode = transformer.value.getNode()
   const stage = transformerNode.getStage()
+  if (!stage) return
 
-  const selectedNode = stage.findOne('.' + selectId.value.toString())
+  const selectedNode = stage.findOne('#' + selectId.value)
   // do nothing if selected node is already attached
   if (selectedNode === transformerNode.node()) {
     return
@@ -62,28 +50,89 @@ const updateTransformer = () => {
 
 const handleStageMouseDown = (e: any) => {
   if (e.target === e.target.getStage()) {
-    selectId.value = -1
+    selectId.value = '-1'
     updateTransformer()
     return
   }
 
-  // clicked on transformer - do nothing
   const clickedOnTransformer = e.target.getParent().className === 'Transformer'
-  if (clickedOnTransformer) {
-    return
-  }
+  if (clickedOnTransformer) return
 
-  // find clicked rect by its id
-  const id = e.target.id()
-  const rect = initialBlocks.find((r) => r.id === id)
-
-  if (rect) {
-    e.target.getParent()?.setAttr('zIndex', maxZIndex.value)
-  }
+  const id = e.target.getParent().id()
+  const rect = initialBlocks.value.find((r) => r.id === id)
+  blockToTheTop(e.target)
 
   selectId.value = rect ? id : -1
 
   updateTransformer()
+}
+
+const setCursor = (e: any, cursor: string) => {
+  const styles = e.target.getStage().container().style
+  styles.cursor = cursor
+}
+
+const blockToTheTop = (target: any) => {
+  const dragItemId = target.id()
+
+  const updatedItems = initialBlocks.value
+  const item = updatedItems.find((i) => i.id === dragItemId)
+  if (!item) return
+
+  const index = updatedItems.indexOf(item)
+  updatedItems.splice(index, 1)
+  updatedItems.push(item)
+  initialBlocks.value = [...updatedItems]
+}
+
+const handleDragStart = (e: any) => {
+  setCursor(e, 'grab')
+  blockToTheTop(e.target)
+}
+
+const handleDragEnd = (e: any) => {
+  // setCursor(e, 'default')
+  // const group = e.target
+  // const rect = group.findOne('.' + rectConfig.id)
+  //
+  // setLocalStorageItem(rectConfig.id.toString(), {
+  //   rect: { ...rect.attrs, name: rectConfig.id.toString() },
+  //   group: group.attrs
+  // })
+}
+
+const handleDrag = (e: any) => {
+  const target = e.target
+
+  const calculateNextStepValue = (value: number) => {
+    const step = 50
+    return Math.round(value / step) * step
+  }
+
+  const [newX, newY] = [target.x(), target.y()].map(calculateNextStepValue)
+
+  target.x(newX)
+  target.y(newY)
+}
+
+const handleMouseEnter = (e: any) => {
+  setCursor(e, 'pointer')
+}
+
+const handleMouseLeave = (e: any) => {
+  setCursor(e, 'default')
+}
+
+const handleTransformEnd = (e: any) => {
+  const target = e.target
+  const targetId = target.id();
+
+  const textNode = target.findOne(`#${targetId}-text`)
+  if (!textNode) return
+
+  const absScale = textNode.getAbsoluteScale()
+  textNode.scaleX(textNode.scaleX() / absScale.x)
+  textNode.scaleY(textNode.scaleY() / absScale.y)
 }
 </script>
 
@@ -94,8 +143,38 @@ const handleStageMouseDown = (e: any) => {
     @touchstart="handleStageMouseDown"
   >
     <v-layer>
-      <grid-block :key="id" v-for="(block, id) in initialBlocks" v-bind="block" />
-      <v-transformer ref="transformer" :config="{ rotateEnabled: false, flipEnabled: false }" />
+      <v-group
+        :key="block.id"
+        v-for="block in initialBlocks"
+        :config="{ draggable: true, id: block.id }"
+        @dragmove="handleDrag"
+        @dragstart="handleDragStart"
+        @dragend="handleDragEnd"
+        @mouseenter="handleMouseEnter"
+        @mouseleave="handleMouseLeave"
+        @transform="handleTransformEnd"
+      >
+        <v-rect
+          :config="{
+            ...block,
+            id: `${block.id}-rect`,
+          }"
+        >
+        </v-rect>
+        <v-text
+          :config="{
+            id: `${block.id}-text`,
+            text: block.text,
+            fontSize: 30,
+            stroke: 'white',
+            fill: 'white'
+          }"
+        />
+      </v-group>
+      <v-transformer
+        ref="transformer"
+        :config="{ rotateEnabled: false, flipEnabled: false }"
+      />
     </v-layer>
   </v-stage>
 </template>

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import Konva from 'konva'
+import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorage'
 
 const width = window.innerWidth
 const height = window.innerHeight
@@ -12,17 +13,21 @@ const stageConfig = {
 
 const defaultProps = {
   width: 300,
-  height: 100
+  height: 100,
+  x: 10,
+  y: 10
 }
 
-const initialBlocks = ref(
+const generateItems = () =>
   Array.from({ length: 5 }).map((_, index) => ({
     ...defaultProps,
     id: 'node-' + index,
     text: index + 1,
     fill: Konva.Util.getRandomColor()
   }))
-)
+
+const localItems = getLocalStorageItem('items')
+const items = reactive(localItems ?? generateItems())
 
 const selectId = ref('-1')
 const transformer = ref<any | null>(null)
@@ -48,6 +53,25 @@ const updateTransformer = () => {
   }
 }
 
+const getTargetParent = (targetNode: any, targetClass: string) => {
+  let target = targetNode
+  while (target.className && target.className !== targetClass) {
+    target = target.getParent()
+  }
+  return target
+}
+
+const blockToTheTop = (target: any) => {
+  const dragItemId = target.id()
+
+  const item = items.find((i) => i.id === dragItemId)
+  if (!item) return
+
+  const index = items.indexOf(item)
+  items.splice(index, 1)
+  items.push(item)
+}
+
 const handleStageMouseDown = (e: any) => {
   if (e.target === e.target.getStage()) {
     selectId.value = '-1'
@@ -58,12 +82,13 @@ const handleStageMouseDown = (e: any) => {
   const clickedOnTransformer = e.target.getParent().className === 'Transformer'
   if (clickedOnTransformer) return
 
-  const id = e.target.getParent().id()
-  const rect = initialBlocks.value.find((r) => r.id === id)
-  blockToTheTop(e.target)
+  const target = getTargetParent(e.target, 'Group')
+  const id = target.id()
+  const rect = items.find((r) => r.id === id)
 
   selectId.value = rect ? id : -1
 
+  blockToTheTop(target)
   updateTransformer()
 }
 
@@ -72,33 +97,21 @@ const setCursor = (e: any, cursor: string) => {
   styles.cursor = cursor
 }
 
-const blockToTheTop = (target: any) => {
-  const dragItemId = target.id()
-
-  const updatedItems = initialBlocks.value
-  const item = updatedItems.find((i) => i.id === dragItemId)
-  if (!item) return
-
-  const index = updatedItems.indexOf(item)
-  updatedItems.splice(index, 1)
-  updatedItems.push(item)
-  initialBlocks.value = [...updatedItems]
-}
-
 const handleDragStart = (e: any) => {
   setCursor(e, 'grab')
-  blockToTheTop(e.target)
+  blockToTheTop(getTargetParent(e.target, 'Group'))
 }
 
 const handleDragEnd = (e: any) => {
-  // setCursor(e, 'default')
-  // const group = e.target
-  // const rect = group.findOne('.' + rectConfig.id)
-  //
-  // setLocalStorageItem(rectConfig.id.toString(), {
-  //   rect: { ...rect.attrs, name: rectConfig.id.toString() },
-  //   group: group.attrs
-  // })
+  const target = getTargetParent(e.target, 'Group')
+  const draggedItemId = target.attrs.id
+
+  const draggedItemIndex = items.findIndex((r) => r.id === draggedItemId)
+
+  if (draggedItemIndex !== -1) {
+    items[draggedItemIndex].x = target.attrs.x
+    items[draggedItemIndex].y = target.attrs.y
+  }
 }
 
 const handleDrag = (e: any) => {
@@ -125,7 +138,7 @@ const handleMouseLeave = (e: any) => {
 
 const handleTransformEnd = (e: any) => {
   const target = e.target
-  const targetId = target.id();
+  const targetId = target.id()
 
   const textNode = target.findOne(`#${targetId}-text`)
   if (!textNode) return
@@ -134,6 +147,11 @@ const handleTransformEnd = (e: any) => {
   textNode.scaleX(textNode.scaleX() / absScale.x)
   textNode.scaleY(textNode.scaleY() / absScale.y)
 }
+
+watch(items, () => {
+  console.log(1)
+  setLocalStorageItem('items', items)
+})
 </script>
 
 <template>
@@ -145,8 +163,8 @@ const handleTransformEnd = (e: any) => {
     <v-layer>
       <v-group
         :key="block.id"
-        v-for="block in initialBlocks"
-        :config="{ draggable: true, id: block.id }"
+        v-for="block in items"
+        :config="{ draggable: true, id: block.id, x: block.x, y: block.y }"
         @dragmove="handleDrag"
         @dragstart="handleDragStart"
         @dragend="handleDragEnd"
@@ -157,7 +175,9 @@ const handleTransformEnd = (e: any) => {
         <v-rect
           :config="{
             ...block,
-            id: `${block.id}-rect`,
+            x: undefined,
+            y: undefined,
+            id: `${block.id}-rect`
           }"
         >
         </v-rect>
@@ -171,10 +191,7 @@ const handleTransformEnd = (e: any) => {
           }"
         />
       </v-group>
-      <v-transformer
-        ref="transformer"
-        :config="{ rotateEnabled: false, flipEnabled: false }"
-      />
+      <v-transformer ref="transformer" :config="{ rotateEnabled: false, flipEnabled: false }" />
     </v-layer>
   </v-stage>
 </template>

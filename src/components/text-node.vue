@@ -7,7 +7,7 @@ defineProps<{
   text: string
 }>()
 
-const textRef = ref(null)
+const textRef = ref<any | null>(null)
 
 onMounted(() => {
   if (!textRef.value) return

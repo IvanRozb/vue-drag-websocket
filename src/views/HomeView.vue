@@ -12,7 +12,7 @@ const stageConfig = {
 
 const step = 50
 
-const defaultProps = {
+const defaultBlock = {
   width: 300,
   height: 100,
   x: step,
@@ -23,9 +23,9 @@ const defaultProps = {
 
 const generateItems = () =>
   Array.from({ length: 5 }).map((_, index) => ({
-    ...defaultProps,
-    x: defaultProps.x + (index % 3) * (step + defaultProps.width) + step,
-    y: defaultProps.y + (step + defaultProps.height) * Math.floor(index / 3) + step,
+    ...defaultBlock,
+    x: defaultBlock.x + (index % 3) * (step + defaultBlock.width) + step,
+    y: defaultBlock.y + (step + defaultBlock.height) * Math.floor(index / 3) + step,
     id: 'node-' + index,
     text: index + 1,
     fill: Konva.Util.getRandomColor()
@@ -221,7 +221,12 @@ const removeItem = (groupId: string) => {
 const restoreLastDeletedItem = () => {
   if (!lastDeletedItem.value) return
 
-  items.splice(lastDeletedItem.value.index, 0, lastDeletedItem.value.item)
+  items.splice(lastDeletedItem.value.index, 0, {
+    ...lastDeletedItem.value.item,
+    ...defaultBlock,
+    x: (stageConfig.width - defaultBlock.width) / 2,
+    y: (stageConfig.height - defaultBlock.height) / 2
+  })
   lastDeletedItem.value = null
 }
 

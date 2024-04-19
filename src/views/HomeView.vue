@@ -2,28 +2,30 @@
 import { reactive, ref, watch } from 'vue'
 import Konva from 'konva'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorage'
-
-const width = window.innerWidth
-const height = window.innerHeight
+import TextNode from '@/components/text-node.vue'
+import { saveTextNodeScale } from '@/helpers/saveTextNodeScale'
 
 const stageConfig = {
-  width: width,
-  height: height
+  width: window.innerWidth,
+  height: window.innerHeight
 }
+
+const step = 50
 
 const defaultProps = {
   width: 300,
   height: 100,
-  x: 10,
-  y: 10
+  x: step,
+  y: step,
+  scaleX: 1,
+  scaleY: 1
 }
-const step = 50
 
 const generateItems = () =>
   Array.from({ length: 5 }).map((_, index) => ({
     ...defaultProps,
-    x: defaultProps.x + (index % 3) * (step + defaultProps.width),
-    y: defaultProps.y + (step + defaultProps.height) * Math.floor(index / 3),
+    x: defaultProps.x + (index % 3) * (step + defaultProps.width) + step,
+    y: defaultProps.y + (step + defaultProps.height) * Math.floor(index / 3) + step,
     id: 'node-' + index,
     text: index + 1,
     fill: Konva.Util.getRandomColor()
@@ -126,8 +128,13 @@ const handleDrag = (e: any) => {
 
   const [newX, newY] = [target.x(), target.y()].map(calculateNextStepValue)
 
-  target.x(newX)
-  target.y(newY)
+  const {
+    attrs: { width, height }
+  } = target.findOne('#' + target.id() + '-rect')
+  const { x, y } = target.getAbsoluteScale()
+
+  target.x(Math.min(Math.max(newX, 0), stageConfig.width - width * x))
+  target.y(Math.min(Math.max(newY, 0), stageConfig.height - height * y))
 }
 
 const handleMouseEnter = (e: any) => {
@@ -138,20 +145,60 @@ const handleMouseLeave = (e: any) => {
   setCursor(e, 'default')
 }
 
-const handleTransformEnd = (e: any) => {
+const handleTransform = (e: any) => {
   const target = e.target
   const targetId = target.id()
 
   const textNode = target.findOne(`#${targetId}-text`)
   if (!textNode) return
 
-  const absScale = textNode.getAbsoluteScale()
-  textNode.scaleX(textNode.scaleX() / absScale.x)
-  textNode.scaleY(textNode.scaleY() / absScale.y)
+  saveTextNodeScale(textNode)
+}
+
+const handleTransformEnd = (e: any) => {
+  const target = e.target
+  const draggedItemId = target.id()
+
+  const draggedItemIndex = items.findIndex((r) => r.id === draggedItemId)
+  if (draggedItemIndex === -1) return
+
+  items[draggedItemIndex].scaleX = target.attrs.scaleX
+  items[draggedItemIndex].scaleY = target.attrs.scaleY
+  items[draggedItemIndex].x = target.attrs.x
+  items[draggedItemIndex].y = target.attrs.y
+}
+
+const boundTransformBoxFunc = (oldBoundBox: any, newBoundBox: any) => {
+  if (Math.abs(newBoundBox.width) < step || Math.abs(newBoundBox.height) < step) {
+    return oldBoundBox
+  }
+
+  let res = { ...newBoundBox }
+
+  const fillDimension = (dimension: string) => {
+    const diffX = Math.abs(oldBoundBox[dimension] - newBoundBox[dimension])
+
+    if (diffX < step) res[dimension] = oldBoundBox[dimension]
+    else res[dimension] = newBoundBox[dimension]
+  }
+
+  const dimensions = ['width', 'height', 'x', 'y']
+  dimensions.forEach(fillDimension)
+
+  const isOut =
+    res.x < 0 ||
+    res.y < 0 ||
+    res.x + res.width > stageConfig.width ||
+    res.y + res.height > stageConfig.height
+
+  if (isOut) {
+    res = oldBoundBox
+  }
+
+  return res
 }
 
 watch(items, () => {
-  console.log(1)
   setLocalStorageItem('items', items)
 })
 </script>
@@ -166,34 +213,44 @@ watch(items, () => {
       <v-group
         :key="block.id"
         v-for="block in items"
-        :config="{ draggable: true, id: block.id, x: block.x, y: block.y }"
+        :config="{
+          draggable: true,
+          id: block.id,
+          x: block.x,
+          y: block.y,
+          scaleX: block.scaleX,
+          scaleY: block.scaleY
+        }"
         @dragmove="handleDrag"
         @dragstart="handleDragStart"
         @dragend="handleDragEnd"
         @mouseenter="handleMouseEnter"
         @mouseleave="handleMouseLeave"
-        @transform="handleTransformEnd"
+        @transform="handleTransform"
+        @transformend="handleTransformEnd"
       >
         <v-rect
           :config="{
             ...block,
             x: undefined,
             y: undefined,
+            scaleX: undefined,
+            scaleY: undefined,
             id: `${block.id}-rect`
           }"
         >
         </v-rect>
-        <v-text
-          :config="{
-            id: `${block.id}-text`,
-            text: block.text,
-            fontSize: 30,
-            stroke: 'white',
-            fill: 'white'
-          }"
-        />
+        <TextNode :id="block.id" :text="block.text" />
       </v-group>
-      <v-transformer ref="transformer" :config="{ rotateEnabled: false, flipEnabled: false }" />
+      <v-transformer
+        ref="transformer"
+        :config="{
+          rotateEnabled: false,
+          flipEnabled: false,
+          // anchorDragBoundFunc: dragTransformBounce
+          boundBoxFunc: boundTransformBoxFunc
+        }"
+      />
     </v-layer>
   </v-stage>
 </template>

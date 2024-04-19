@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import Konva from 'konva'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorage'
 import TextNode from '@/components/text-node.vue'
@@ -204,53 +204,63 @@ watch(items, () => {
 </script>
 
 <template>
-  <v-stage
-    :config="stageConfig"
-    @mousedown="handleStageMouseDown"
-    @touchstart="handleStageMouseDown"
-  >
-    <v-layer>
-      <v-group
-        :key="block.id"
-        v-for="block in items"
-        :config="{
-          draggable: true,
-          id: block.id,
-          x: block.x,
-          y: block.y,
-          scaleX: block.scaleX,
-          scaleY: block.scaleY
-        }"
-        @dragmove="handleDrag"
-        @dragstart="handleDragStart"
-        @dragend="handleDragEnd"
-        @mouseenter="handleMouseEnter"
-        @mouseleave="handleMouseLeave"
-        @transform="handleTransform"
-        @transformend="handleTransformEnd"
-      >
-        <v-rect
+  <div class="grid" :style="{ '--step': `${step}px` }">
+    <v-stage
+      :config="stageConfig"
+      @mousedown="handleStageMouseDown"
+      @touchstart="handleStageMouseDown"
+    >
+      <v-layer>
+        <v-group
+          :key="block.id"
+          v-for="block in items"
           :config="{
-            ...block,
-            x: undefined,
-            y: undefined,
-            scaleX: undefined,
-            scaleY: undefined,
-            id: `${block.id}-rect`
+            draggable: true,
+            id: block.id,
+            x: block.x,
+            y: block.y,
+            scaleX: block.scaleX,
+            scaleY: block.scaleY
           }"
+          @dragmove="handleDrag"
+          @dragstart="handleDragStart"
+          @dragend="handleDragEnd"
+          @mouseenter="handleMouseEnter"
+          @mouseleave="handleMouseLeave"
+          @transform="handleTransform"
+          @transformend="handleTransformEnd"
         >
-        </v-rect>
-        <TextNode :id="block.id" :text="block.text" />
-      </v-group>
-      <v-transformer
-        ref="transformer"
-        :config="{
-          rotateEnabled: false,
-          flipEnabled: false,
-          // anchorDragBoundFunc: dragTransformBounce
-          boundBoxFunc: boundTransformBoxFunc
-        }"
-      />
-    </v-layer>
-  </v-stage>
+          <v-rect
+            :config="{
+              ...block,
+              x: undefined,
+              y: undefined,
+              scaleX: undefined,
+              scaleY: undefined,
+              id: `${block.id}-rect`
+            }"
+          >
+          </v-rect>
+          <TextNode :id="block.id" :text="block.text" />
+        </v-group>
+        <v-transformer
+          ref="transformer"
+          :config="{
+            rotateEnabled: false,
+            flipEnabled: false,
+            // anchorDragBoundFunc: dragTransformBounce
+            boundBoxFunc: boundTransformBoxFunc
+          }"
+        />
+      </v-layer>
+    </v-stage>
+  </div>
 </template>
+
+<style scoped lang="scss">
+.grid {
+  background-image: repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%),
+    repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
+  background-size: var(--step) var(--step);
+}
+</style>

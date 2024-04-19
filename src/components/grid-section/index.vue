@@ -2,10 +2,22 @@
 import { reactive, ref, watch } from 'vue'
 import GridSectionInfoRestore from '@/components/grid-section/restore.vue'
 import GridSectionInfoAgenda from '@/components/grid-section/agenda.vue'
-import Konva from 'konva'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorage'
-import TextNode from '@/components/text-node.vue'
-import { saveTextNodeScale } from '@/helpers/saveTextNodeScale'
+import TextNode from '@/components/grid-section/text-node.vue'
+import type { IBlock } from '@/components/grid-section/interfaces/IBlock'
+import { generateItems } from '@/components/grid-section/helpers/generateItems'
+import type {
+  KonvaDragEvent,
+  KonvaMouseDownEvent,
+  KonvaNode,
+  KonvaStage,
+  KonvaTransformer,
+  KonvaTransformEvent
+} from '@/types/konva'
+import { getTargetGroup } from '@/components/grid-section/helpers/getTargetGroup'
+import { getTransformBox } from '@/components/grid-section/helpers/getTransformBox'
+import type { IBox } from '@/components/grid-section/interfaces/IBox'
+import { saveTextNodeScale } from '@/components/grid-section/interfaces/saveTextNodeScale'
 
 const stageConfig = {
   width: window.innerWidth,
@@ -14,7 +26,7 @@ const stageConfig = {
 
 const step = 50
 
-const defaultBlock = {
+const defaultItem = {
   width: 300,
   height: 100,
   x: step,
@@ -23,28 +35,32 @@ const defaultBlock = {
   scaleY: 1
 }
 
-const generateItems = () =>
-  Array.from({ length: 5 }).map((_, index) => ({
-    ...defaultBlock,
-    x: defaultBlock.x + (index % 3) * (step + defaultBlock.width) + step,
-    y: defaultBlock.y + (step + defaultBlock.height) * Math.floor(index / 3) + step,
-    id: 'node-' + index,
-    text: index + 1,
-    fill: Konva.Util.getRandomColor()
-  }))
-
-const localItems = getLocalStorageItem('items')
-const items = reactive(localItems ?? generateItems())
+// State
+const localItems = getLocalStorageItem<IBlock[]>('items')
+const items = reactive<IBlock[]>(localItems ?? generateItems(defaultItem, step))
 
 const selectId = ref('-1')
-const lastDeletedItem = ref<any | null>(null)
 
-const transformer = ref<any | null>(null)
-const stageRef = ref<any | null>(null)
+const localLastDeletedItem = getLocalStorageItem<{
+  item: IBlock
+  index: number
+}>('last-deleted-item')
+const lastDeletedItem = ref<{
+  item: IBlock
+  index: number
+} | null>(localLastDeletedItem)
 
+const transformerRef = ref<KonvaTransformer | null>(null)
+const stageRef = ref<KonvaStage | null>(null)
+
+// Watchers
+watch(items, () => setLocalStorageItem('items', items))
+watch(lastDeletedItem, () => setLocalStorageItem('last-deleted-item', lastDeletedItem.value))
+
+// Helpers
 const updateTransformer = () => {
-  if (!transformer.value) return
-  const transformerNode = transformer.value.getNode()
+  if (!transformerRef.value) return
+  const transformerNode = transformerRef.value.getNode()
   const stage = transformerNode.getStage()
   if (!stage) return
 
@@ -63,43 +79,15 @@ const updateTransformer = () => {
   }
 }
 
-const getTargetParent = (targetNode: any, targetClass: string) => {
-  let target = targetNode
-  while (target.className && target.className !== targetClass) {
-    target = target.getParent()
-  }
-  return target
-}
-
-const blockToTheTop = (target: any) => {
+const blockToTheTop = (target: KonvaNode) => {
   const dragItemId = target.id()
 
-  const item = items.find((i: any) => i.id === dragItemId)
+  const item = items.find((i) => i.id === dragItemId.toString())
   if (!item) return
 
   const index = items.indexOf(item)
   items.splice(index, 1)
   items.push(item)
-}
-
-const handleStageMouseDown = (e: any) => {
-  if (e.target === e.target.getStage()) {
-    selectId.value = '-1'
-    updateTransformer()
-    return
-  }
-
-  const clickedOnTransformer = e.target.getParent().className === 'Transformer'
-  if (clickedOnTransformer) return
-
-  const target = getTargetParent(e.target, 'Group')
-  const id = target.id()
-  const rect = items.find((r: any) => r.id === id)
-
-  selectId.value = rect ? id : -1
-
-  blockToTheTop(target)
-  updateTransformer()
 }
 
 const setCursor = (cursor: string) => {
@@ -109,24 +97,46 @@ const setCursor = (cursor: string) => {
   styles.cursor = cursor
 }
 
-const handleDragStart = (e: any) => {
-  setCursor('grab')
-  blockToTheTop(getTargetParent(e.target, 'Group'))
-}
-
-const handleDragEnd = (e: any) => {
-  const target = getTargetParent(e.target, 'Group')
-  const draggedItemId = target.attrs.id
-
-  const draggedItemIndex = items.findIndex((r: any) => r.id === draggedItemId)
-
-  if (draggedItemIndex !== -1) {
-    items[draggedItemIndex].x = target.attrs.x
-    items[draggedItemIndex].y = target.attrs.y
+// Handlers
+const handleStageMouseDown = (e: KonvaMouseDownEvent) => {
+  if (e.target === e.target.getStage()) {
+    selectId.value = '-1'
+    updateTransformer()
+    return
   }
+
+  const clickedOnTransformer = e.target.getParent().className === 'Transformer'
+  if (clickedOnTransformer) return
+
+  const target = getTargetGroup(e.target)
+  const id = target.id()
+  const rect = items.find((r) => r.id === id.toString())
+
+  selectId.value = rect ? id.toString() : '-1'
+
+  blockToTheTop(target)
+  updateTransformer()
 }
 
-const handleDrag = (e: any) => {
+const handleDragStart = (e: KonvaDragEvent) => {
+  setCursor('grab')
+
+  const group = getTargetGroup(e.target)
+  blockToTheTop(group)
+}
+
+const handleDragEnd = (e: KonvaDragEvent) => {
+  const target = getTargetGroup(e.target)
+  const draggedItemId = target.id()
+
+  const draggedItemIndex = items.findIndex((r) => r.id === draggedItemId.toString())
+  if (draggedItemIndex === -1) return
+
+  items[draggedItemIndex].x = target.x()
+  items[draggedItemIndex].y = target.y()
+}
+
+const handleDrag = (e: KonvaDragEvent) => {
   const target = e.target
 
   const calculateNextStepValue = (value: number) => {
@@ -144,15 +154,10 @@ const handleDrag = (e: any) => {
   target.y(Math.min(Math.max(newY, 0), stageConfig.height - height * y))
 }
 
-const handleMouseEnter = (e: any) => {
-  setCursor('pointer')
-}
+const handleMouseEnter = () => setCursor('pointer')
+const handleMouseLeave = () => setCursor('default')
 
-const handleMouseLeave = (e: any) => {
-  setCursor('default')
-}
-
-const handleTransform = (e: any) => {
+const handleTransform = (e: KonvaTransformEvent) => {
   const target = e.target
   const targetId = target.id()
 
@@ -162,79 +167,52 @@ const handleTransform = (e: any) => {
   saveTextNodeScale(textNode)
 }
 
-const handleTransformEnd = (e: any) => {
+const handleTransformEnd = (e: KonvaTransformEvent) => {
   const target = e.target
   const draggedItemId = target.id()
 
-  const draggedItemIndex = items.findIndex((r: any) => r.id === draggedItemId)
+  const draggedItemIndex = items.findIndex((r) => r.id === draggedItemId.toString())
   if (draggedItemIndex === -1) return
 
-  items[draggedItemIndex].scaleX = target.attrs.scaleX
-  items[draggedItemIndex].scaleY = target.attrs.scaleY
-  items[draggedItemIndex].x = target.attrs.x
-  items[draggedItemIndex].y = target.attrs.y
-}
-
-const boundTransformBoxFunc = (oldBoundBox: any, newBoundBox: any) => {
-  if (Math.abs(newBoundBox.width) < step || Math.abs(newBoundBox.height) < step) {
-    return oldBoundBox
-  }
-
-  let res = { ...newBoundBox }
-
-  const fillDimension = (dimension: string) => {
-    const diffX = Math.abs(oldBoundBox[dimension] - newBoundBox[dimension])
-
-    if (diffX < step) res[dimension] = oldBoundBox[dimension]
-    else res[dimension] = newBoundBox[dimension]
-  }
-
-  const dimensions = ['width', 'height', 'x', 'y']
-  dimensions.forEach(fillDimension)
-  const isOut =
-    res.x < 0 ||
-    res.y < 0 ||
-    res.x + res.width > stageConfig.width ||
-    res.y + res.height > stageConfig.height
-
-  if (isOut) {
-    res = oldBoundBox
-  }
-
-  return res
+  items[draggedItemIndex].scaleX = target.scaleX()
+  items[draggedItemIndex].scaleY = target.scaleY()
+  items[draggedItemIndex].x = target.x()
+  items[draggedItemIndex].y = target.y()
 }
 
 const removeItem = (groupId: string) => {
-  const index = items.findIndex((item: any) => item.id === groupId)
+  const index = items.findIndex((item) => item.id === groupId)
   if (index === -1) return
 
   const [deletedItem] = items.splice(index, 1)
   lastDeletedItem.value = { item: deletedItem, index }
 
-  const transformerNode = transformer.value.getNode()
-  if (!transformerNode) return
-
-  transformerNode.nodes([])
-
-  const stage = transformerNode.getStage()
   setCursor('default')
+
+  if (!transformerRef.value) return
+
+  const transformerNode = transformerRef.value.getNode()
+  transformerNode.nodes([])
 }
 
 const restoreLastDeletedItem = () => {
   if (!lastDeletedItem.value) return
 
-  items.splice(lastDeletedItem.value.index, 0, {
+  const itemToInsert = {
     ...lastDeletedItem.value.item,
-    ...defaultBlock,
-    x: (stageConfig.width - defaultBlock.width) / 2,
-    y: (stageConfig.height - defaultBlock.height) / 2
-  })
+    ...defaultItem,
+    fill: lastDeletedItem.value.item.fill,
+    x: (stageConfig.width - defaultItem.width) / 2,
+    y: (stageConfig.height - defaultItem.height) / 2
+  }
+  items.splice(lastDeletedItem.value.index, 0, itemToInsert)
+
   lastDeletedItem.value = null
 }
 
-watch(items, () => {
-  setLocalStorageItem('items', items)
-})
+const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
+  getTransformBox(oldBox, newBox, step, stageConfig)
+}
 </script>
 
 <template>
@@ -281,11 +259,11 @@ watch(items, () => {
           <TextNode :id="block.id" :text="block.text" />
         </v-group>
         <v-transformer
-          ref="transformer"
+          ref="transformerRef"
           :config="{
             rotateEnabled: false,
             flipEnabled: false,
-            boundBoxFunc: boundTransformBoxFunc
+            boundBoxFunc: handleBoundBox
           }"
         />
       </v-layer>

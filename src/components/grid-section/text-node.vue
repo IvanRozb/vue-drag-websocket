@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { saveTextNodeScale } from '@/helpers/saveTextNodeScale'
+import type { KonvaText } from '@/types/konva'
+import { saveTextNodeScale } from '@/components/grid-section/interfaces/saveTextNodeScale'
 
 defineProps<{
   id: string
   text: string
 }>()
 
-const textRef = ref<any | null>(null)
+const textRef = ref<KonvaText | null>(null)
 
 onMounted(() => {
   if (!textRef.value) return
-
   const node = textRef.value.getNode()
-  saveTextNodeScale(node)
+
+  return saveTextNodeScale(node)
 })
 </script>
 

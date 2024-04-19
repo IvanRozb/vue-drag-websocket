@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
+import GridSectionInfoRestore from '@/components/grid-section/restore.vue'
+import GridSectionInfoAgenda from '@/components/grid-section/agenda.vue'
 import Konva from 'konva'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorage'
 import TextNode from '@/components/text-node.vue'
@@ -237,20 +239,7 @@ watch(items, () => {
 
 <template>
   <div class="grid" :style="{ '--step': `${step}px` }">
-    <svg
-      v-if="lastDeletedItem"
-      @click="restoreLastDeletedItem"
-      class="grid__return grid__info"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 48 48"
-    >
-      <path d="M0 0h48v48H0z" fill="none" />
-      <g id="Shopicon">
-        <path
-          d="M10,22v2c0,7.72,6.28,14,14,14s14-6.28,14-14s-6.28-14-14-14h-6.662l3.474-4.298l-3.11-2.515L10.577,12l7.125,8.813   l3.11-2.515L17.338,14H24c5.514,0,10,4.486,10,10s-4.486,10-10,10s-10-4.486-10-10v-2H10z"
-        />
-      </g>
-    </svg>
+    <GridSectionInfoRestore v-if="lastDeletedItem" @click="restoreLastDeletedItem" class="info" />
     <v-stage
       ref="stageRef"
       :config="stageConfig"
@@ -301,7 +290,7 @@ watch(items, () => {
         />
       </v-layer>
     </v-stage>
-    <div class="grid__agenda grid__info">To delete an item, just double-click on it.</div>
+    <GridSectionInfoAgenda class="info" />
   </div>
 </template>
 
@@ -311,35 +300,13 @@ watch(items, () => {
     repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
   background-size: var(--step) var(--step);
 
-  &__info {
+  .info {
     position: absolute;
     top: 0;
     z-index: 10;
 
     background-color: white;
     border: 1px solid black;
-  }
-
-  &__return {
-    left: 0;
-
-    width: calc(var(--step) * 1);
-    height: calc(var(--step) * 1);
-
-    cursor: pointer;
-
-    &:hover {
-      stroke: green;
-      fill: green;
-    }
-  }
-
-  &__agenda {
-    right: 0;
-    padding: 20px 12px;
-
-    font-family: 'Roboto Light', sans-serif;
-    font-size: 1.25rem;
   }
 }
 </style>

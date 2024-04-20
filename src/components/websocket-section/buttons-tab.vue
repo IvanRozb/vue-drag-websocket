@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import UiButton from '@/components/ui/button.vue'
+
 defineProps<{
   startWebSocket: (e: MouseEvent) => void
   stopWebSocket: (e: MouseEvent) => void
@@ -9,13 +11,13 @@ defineProps<{
 
 <template>
   <div class="buttons">
-    <button class="button button-start" @click="startWebSocket" :disabled="isWebSocketOpen">
+    <ui-button class="button-start" @click="startWebSocket" :disabled="isWebSocketOpen">
       Start
-    </button>
-    <button class="button button-stop" @click="stopWebSocket" :disabled="!isWebSocketOpen">
+    </ui-button>
+    <ui-button class="button-stop" @click="stopWebSocket" :disabled="!isWebSocketOpen">
       Stop
-    </button>
-    <button class="button button-reset" @click="reset">Reset</button>
+    </ui-button>
+    <ui-button class="button-reset" @click="reset">Reset</ui-button>
   </div>
 </template>
 
@@ -25,21 +27,6 @@ defineProps<{
   justify-content: space-between;
 
   margin-bottom: 32px;
-
-  .button {
-    all: unset;
-
-    padding: 12px 20px;
-    border-radius: 8px;
-
-    color: white;
-    cursor: pointer;
-
-    &[disabled] {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
 
   .button-start {
     background-color: green;

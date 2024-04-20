@@ -4,6 +4,7 @@ import { Websocket, WebsocketBuilder } from 'websocket-ts'
 import ButtonsTab from '@/components/websocket-section/buttons-tab.vue'
 import type { ITransaction } from '@/components/websocket-section/interfaces/ITransaction'
 import TransactionsTable from '@/components/websocket-section/transactions-table.vue'
+import UiLoader from '@/components/ui/loader.vue'
 
 // Websocket Event Handlers
 const handleOpen = () => {
@@ -67,6 +68,7 @@ const reset = () => {
       :reset="reset"
     />
     <transactions-table :total-amount="totalAmount" :transactions="transactions" />
+    <ui-loader v-if="isWebSocketOpen" />
   </div>
 </template>
 

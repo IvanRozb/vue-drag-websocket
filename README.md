@@ -1,7 +1,7 @@
 # Vue Interactive Workspace & WebSocket Project
 
 This project implements an interactive workspace and real-time interaction with a server using the WebSocket protocol.
-Project deployed at [Vue Drag & WebSocket](https://vue-drag-websocket-l5unsmkjg-ivanrozbs-projects.vercel.app/)
+Project deployed at vercel: [Vue Drag & WebSocket](https://vue-drag-websocket-l5unsmkjg-ivanrozbs-projects.vercel.app/)
 
 ## Project Setup
 
@@ -30,8 +30,8 @@ npm run lint
 ## Interactive workspace
 
 ### Libraries/resources used:
-- vue-konva/konva - provide system for handling interactive movement, resizing of blocks
-- localstorage - provide the way to store the data, so it would be restores if browser is closed/updated
+- vue-konva/konva - the library that provides system for handling interactive movement, resizing of blocks. One of the most popular libraries for canvas handling.
+- localstorage - the build-in solution that provides the way to store the data, so it would be restores if browser is closed/updated
 
 ### Algorithms and Data Structures
 In this section I used an array as the main data structure as it stores the data about list of blocks which user interacts with.
@@ -50,11 +50,15 @@ Also, event-delegation pattern is used(```getTargetNodeByClassName``` util), sin
 <br/>
 <br/>
 Setting and getting by key from localstorage is also implemented.
+<br/>
+<br/>
+And other algorithms are implemented such as removing, restoring the item from an array.
 
 ## Interaction with the server using the WebSocket protocol
 
 ### Libraries/resources used:
 - websocket-ts - provide typescript version of build-in WebSocket
+- Blockchain WebSocket API - the API used for getting unsubscribed transactions data
 
 ### Algorithms and Data Structures
 In this section I used only an array as the only data structure as the user need to see only the list of transactions.

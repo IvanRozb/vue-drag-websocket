@@ -6,7 +6,7 @@
 .button {
   all: unset;
 
-  padding: 12px 20px;
+  padding: 16px 80px;
   border-radius: 8px;
 
   color: white;

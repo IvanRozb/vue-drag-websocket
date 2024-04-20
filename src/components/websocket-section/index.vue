@@ -79,6 +79,7 @@ const reset = () => {
   width: 100%;
   max-width: 1000px;
 
-  margin: 32px auto;
+  margin: 60px auto;
+  padding: 0 15px;
 }
 </style>

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 const routes = [
   {
+    to: '/',
+    title: 'Home'
+  },
+  {
     to: '/interactive',
     title: 'Workspace'
   },

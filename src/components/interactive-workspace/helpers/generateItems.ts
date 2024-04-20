@@ -1,4 +1,4 @@
-import type { IBlock } from '@/components/grid-section/interfaces/IBlock'
+import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
 import Konva from 'konva'
 
 export const generateItems = (defaultItem: Partial<IBlock>, step: number): IBlock[] =>

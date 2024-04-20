@@ -217,7 +217,11 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
 
 <template>
   <div class="grid" :style="{ '--step': `${step}px` }">
-    <grid-section-info-restore v-if="lastDeletedItem" @click="restoreLastDeletedItem" class="info" />
+    <grid-section-info-restore
+      v-if="lastDeletedItem"
+      @click="restoreLastDeletedItem"
+      class="info"
+    />
     <v-stage
       ref="stageRef"
       :config="stageConfig"

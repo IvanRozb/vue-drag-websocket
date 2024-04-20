@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
-import GridSectionInfoRestore from '@/components/grid-section/restore.vue'
-import GridSectionInfoAgenda from '@/components/grid-section/agenda.vue'
+import InteractiveWorkspaceSectionInfoRestore from '@/components/interactive-workspace/restore.vue'
+import InteractiveWorkspaceSectionInfoAgenda from '@/components/interactive-workspace/agenda.vue'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorage'
-import TextNode from '@/components/grid-section/text-node.vue'
-import type { IBlock } from '@/components/grid-section/interfaces/IBlock'
-import { generateItems } from '@/components/grid-section/helpers/generateItems'
+import TextNode from '@/components/interactive-workspace/text-node.vue'
+import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
+import { generateItems } from '@/components/interactive-workspace/helpers/generateItems'
 import type {
   KonvaDragEvent,
   KonvaMouseDownEvent,
@@ -14,10 +14,10 @@ import type {
   KonvaTransformer,
   KonvaTransformEvent
 } from '@/types/konva'
-import { getTargetGroup } from '@/components/grid-section/helpers/getTargetGroup'
-import { getTransformBox } from '@/components/grid-section/helpers/getTransformBox'
-import type { IBox } from '@/components/grid-section/interfaces/IBox'
-import { saveTextNodeScale } from '@/components/grid-section/interfaces/saveTextNodeScale'
+import { getTargetGroup } from '@/components/interactive-workspace/helpers/getTargetGroup'
+import { getTransformBox } from '@/components/interactive-workspace/helpers/getTransformBox'
+import type { IBox } from '@/components/interactive-workspace/interfaces/IBox'
+import { saveTextNodeScale } from '@/components/interactive-workspace/interfaces/saveTextNodeScale'
 
 const stageConfig = {
   width: window.innerWidth,
@@ -216,8 +216,8 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
 </script>
 
 <template>
-  <div class="grid" :style="{ '--step': `${step}px` }">
-    <grid-section-info-restore
+  <div class="interactive-workspace" :style="{ '--step': `${step}px` }">
+    <interactive-workspace-section-info-restore
       v-if="lastDeletedItem"
       @click="restoreLastDeletedItem"
       class="info"
@@ -272,12 +272,12 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
         />
       </v-layer>
     </v-stage>
-    <grid-section-info-agenda class="info" />
+    <interactive-workspace-section-info-agenda class="info" />
   </div>
 </template>
 
 <style scoped lang="scss">
-.grid {
+.interactive-workspace {
   background-image: repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%),
     repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
   background-size: var(--step) var(--step);

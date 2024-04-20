@@ -70,7 +70,7 @@ const reset = () => {
   </div>
 </template>
 
-<style>
+<style scoped lang="scss">
 .container {
   display: flex;
   flex-direction: column;

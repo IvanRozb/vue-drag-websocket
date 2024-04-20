@@ -1,4 +1,4 @@
-import type { IBox, IDimensions } from '@/components/grid-section/interfaces/IBox'
+import type { IBox, IDimensions } from '@/components/interactive-workspace/interfaces/IBox'
 
 export const getTransformBox = (
   oldBoundBox: IBox,

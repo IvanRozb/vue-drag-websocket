@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import GridSection from '@/components/grid-section/index.vue'
+import HomeSection from '@/components/home-section.vue'
 </script>
 
 <template>
-  <grid-section />
+  <home-section />
 </template>

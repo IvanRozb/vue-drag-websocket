@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
-import InteractiveWorkspaceSectionInfoRestore from '@/components/interactive-workspace/restore.vue'
-import InteractiveWorkspaceSectionInfoAgenda from '@/components/interactive-workspace/agenda.vue'
+import InteractiveWorkspaceInfoRestore from '@/components/interactive-workspace/restore.vue'
+import InteractiveWorkspaceInfoAgenda from '@/components/interactive-workspace/agenda.vue'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorage'
 import TextNode from '@/components/interactive-workspace/text-node.vue'
 import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
@@ -217,7 +217,7 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
 
 <template>
   <div class="interactive-workspace" :style="{ '--step': `${step}px` }">
-    <interactive-workspace-section-info-restore
+    <interactive-workspace-info-restore
       v-if="lastDeletedItem"
       @click="restoreLastDeletedItem"
       class="info"
@@ -272,7 +272,7 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
         />
       </v-layer>
     </v-stage>
-    <interactive-workspace-section-info-agenda class="info" />
+    <interactive-workspace-info-agenda class="info" />
   </div>
 </template>
 
@@ -284,7 +284,6 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
 
   .info {
     position: absolute;
-    top: 0;
     z-index: 10;
 
     background-color: white;

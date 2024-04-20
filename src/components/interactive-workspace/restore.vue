@@ -11,6 +11,7 @@
 
 <style scoped lang="scss">
 .restore {
+  bottom: 0;
   left: 0;
 
   width: calc(var(--step) * 1);

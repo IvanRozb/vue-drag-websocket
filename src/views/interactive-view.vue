@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import InteractiveWorkspaceSection from '@/components/interactive-workspace/index.vue'
+import InteractiveWorkspace from '@/components/interactive-workspace/index.vue'
+import Navigation from '@/components/navigation.vue'
 </script>
 
 <template>
-  <interactive-workspace-section />
+  <navigation />
+  <interactive-workspace />
 </template>

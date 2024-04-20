@@ -211,13 +211,17 @@ const restoreLastDeletedItem = () => {
 }
 
 const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
-  getTransformBox(oldBox, newBox, step, stageConfig)
+  return getTransformBox(oldBox, newBox, step, stageConfig)
 }
 </script>
 
 <template>
   <div class="grid" :style="{ '--step': `${step}px` }">
-    <grid-section-info-restore v-if="lastDeletedItem" @click="restoreLastDeletedItem" class="info" />
+    <grid-section-info-restore
+      v-if="lastDeletedItem"
+      @click="restoreLastDeletedItem"
+      class="info"
+    />
     <v-stage
       ref="stageRef"
       :config="stageConfig"

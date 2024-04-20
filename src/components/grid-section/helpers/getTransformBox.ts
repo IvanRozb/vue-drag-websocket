@@ -17,6 +17,8 @@ export const getTransformBox = (
 
     if (diffX < step) res[dimension] = oldBoundBox[dimension]
     else res[dimension] = newBoundBox[dimension]
+
+    res[dimension] = Math.round(res[dimension] / step) * step
   }
 
   const boxProps: (keyof IBox)[] = ['width', 'height', 'x', 'y']

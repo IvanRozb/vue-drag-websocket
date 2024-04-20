@@ -16,7 +16,8 @@
     "konva": "^9.3.6",
     "vue": "^3.4.21",
     "vue-konva": "^3.0.2",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "websocket-ts": "^2.1.5"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",

@@ -7,7 +7,6 @@
   right: 0;
   padding: 20px 12px;
 
-  font-family: 'Roboto Light', sans-serif;
   font-size: 1.25rem;
 }
 </style>

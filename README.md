@@ -58,7 +58,7 @@ And other algorithms are implemented such as removing, restoring the item from a
 
 ### Libraries/resources used:
 - websocket-ts - provide typescript version of build-in WebSocket
-- Blockchain WebSocket API - the API used for getting unsubscribed transactions data
+- [Blockchain WebSocket API](https://www.blockchain.com/explorer/api/api_websocket) - the API used for getting unsubscribed transactions data
 
 ### Algorithms and Data Structures
 In this section I used only an array as the only data structure as the user need to see only the list of transactions.

@@ -1,7 +1,7 @@
 # Vue Interactive Workspace & WebSocket Project
 
 This project implements an interactive workspace and real-time interaction with a server using the WebSocket protocol.
-Project deployed at vercel: [Vue Drag & WebSocket](https://vue-drag-websocket-l5unsmkjg-ivanrozbs-projects.vercel.app/)
+Project deployed at vercel: [Vue Drag & WebSocket](https://vue-drag-websocket-83sjcdsit-ivanrozbs-projects.vercel.app/)
 
 ## Project Setup
 

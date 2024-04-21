@@ -7,7 +7,7 @@ interface KonvaNode extends Node {
   getStage(): KonvaNode
   node(): Node<NodeConfig>
   nodes(nodes: Node<NodeConfig>[]): void
-  id(): number
+  id(): string
   x(value?: number): number
   y(value?: number): number
   scaleX(value?: number): number

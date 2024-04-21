@@ -17,6 +17,7 @@
     "vue": "^3.4.21",
     "vue-konva": "^3.0.2",
     "vue-router": "^4.3.0",
+    "vuex": "^4.0.2",
     "websocket-ts": "^2.1.5"
   },
   "devDependencies": {

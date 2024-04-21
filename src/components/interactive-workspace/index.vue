@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import InteractiveWorkspaceInfoRestore from '@/components/interactive-workspace/restore.vue'
 import InteractiveWorkspaceInfoAgenda from '@/components/interactive-workspace/agenda.vue'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorage'
-import TextNode from '@/components/interactive-workspace/text-node.vue'
 import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
 import { generateItems } from '@/components/interactive-workspace/helpers/generateItems'
 import type {
@@ -15,10 +14,12 @@ import type {
   KonvaTransformEvent
 } from '@/types/konva'
 import { getTargetGroup } from '@/components/interactive-workspace/helpers/getTargetGroup'
-import { getTransformBox } from '@/components/interactive-workspace/helpers/getTransformBox'
-import type { IBox } from '@/components/interactive-workspace/interfaces/IBox'
 import { saveTextNodeScale } from '@/components/interactive-workspace/interfaces/saveTextNodeScale'
+import BlockNode from '@/components/interactive-workspace/block-node.vue'
+import TransformerNode from '@/components/interactive-workspace/transformer-node.vue'
+import { useWorkspaceStore, workspaceStore } from '@/store/workspace'
 
+// Constants
 const stageConfig = {
   width: window.innerWidth,
   height: window.innerHeight
@@ -36,6 +37,8 @@ const defaultItem = {
 }
 
 // State
+const workspaceState = useWorkspaceStore()
+
 const localItems = getLocalStorageItem<IBlock[]>('items')
 const items = reactive<IBlock[]>(localItems ?? generateItems(defaultItem, step))
 
@@ -50,8 +53,11 @@ const lastDeletedItem = ref<{
   index: number
 } | null>(localLastDeletedItem)
 
-const transformerRef = ref<KonvaTransformer | null>(null)
 const stageRef = ref<KonvaStage | null>(null)
+
+onMounted(() => {
+  workspaceState.dispatch('updateStageRef', stageRef.value)
+})
 
 // Watchers
 watch(items, () => setLocalStorageItem('items', items))
@@ -59,8 +65,9 @@ watch(lastDeletedItem, () => setLocalStorageItem('last-deleted-item', lastDelete
 
 // Helpers
 const updateTransformer = () => {
-  if (!transformerRef.value) return
-  const transformerNode = transformerRef.value.getNode()
+  if (!workspaceState.state.transformerRef) return
+
+  const transformerNode = workspaceState.state.transformerRef.getNode()
   const stage = transformerNode.getStage()
   if (!stage) return
 
@@ -189,9 +196,9 @@ const removeItem = (groupId: string) => {
 
   setCursor('default')
 
-  if (!transformerRef.value) return
+  if (!workspaceState.state.transformerRef) return
 
-  const transformerNode = transformerRef.value.getNode()
+  const transformerNode = workspaceState.state.transformerRef.getNode()
   transformerNode.nodes([])
 }
 
@@ -209,10 +216,6 @@ const restoreLastDeletedItem = () => {
 
   lastDeletedItem.value = null
 }
-
-const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
-  return getTransformBox(oldBox, newBox, step, stageConfig)
-}
 </script>
 
 <template>
@@ -229,17 +232,10 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
       @touchstart="handleStageMouseDown"
     >
       <v-layer>
-        <v-group
+        <block-node
+          :block="block"
           :key="block.id"
           v-for="block in items"
-          :config="{
-            draggable: true,
-            id: block.id,
-            x: block.x,
-            y: block.y,
-            scaleX: block.scaleX,
-            scaleY: block.scaleY
-          }"
           @dblclick="removeItem(block.id)"
           @dragmove="handleDrag"
           @dragstart="handleDragStart"
@@ -248,28 +244,8 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
           @mouseleave="handleMouseLeave"
           @transform="handleTransform"
           @transformend="handleTransformEnd"
-        >
-          <v-rect
-            :config="{
-              ...block,
-              x: undefined,
-              y: undefined,
-              scaleX: undefined,
-              scaleY: undefined,
-              id: `${block.id}-rect`
-            }"
-          >
-          </v-rect>
-          <text-node :id="block.id" :text="block.text" />
-        </v-group>
-        <v-transformer
-          ref="transformerRef"
-          :config="{
-            rotateEnabled: false,
-            flipEnabled: false,
-            boundBoxFunc: handleBoundBox
-          }"
         />
+        <transformer-node :transform-step="step" />
       </v-layer>
     </v-stage>
     <interactive-workspace-info-agenda class="info" />

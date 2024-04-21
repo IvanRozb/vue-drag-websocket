@@ -5,6 +5,7 @@ import type { KonvaDragEvent, KonvaTransformEvent } from '@/types/konva'
 import { saveTextNodeScale } from '@/components/interactive-workspace/interfaces/saveTextNodeScale'
 import { useStore } from '@/store'
 import RectNode from '@/components/interactive-workspace/stage-node/group-node/rect-node.vue'
+import { STAGE_DIMENSIONS, STEP } from '@/constants/workspace'
 
 defineProps<{
   block: IBlock
@@ -36,7 +37,7 @@ const handleDrag = (e: KonvaDragEvent) => {
   const target = e.target
 
   const calculateNextStepValue = (value: number) => {
-    return Math.round(value / store.state.workspaceStore.step) * store.state.workspaceStore.step
+    return Math.round(value / STEP) * STEP
   }
 
   const [newX, newY] = [target.x(), target.y()].map(calculateNextStepValue)
@@ -46,12 +47,8 @@ const handleDrag = (e: KonvaDragEvent) => {
   } = target.findOne('#' + target.id() + '-rect')
   const { x, y } = target.getAbsoluteScale()
 
-  target.x(
-    Math.min(Math.max(newX, 0), store.state.workspaceStore.stageDimensions.width - width * x)
-  )
-  target.y(
-    Math.min(Math.max(newY, 0), store.state.workspaceStore.stageDimensions.height - height * y)
-  )
+  target.x(Math.min(Math.max(newX, 0), STAGE_DIMENSIONS.width - width * x))
+  target.y(Math.min(Math.max(newY, 0), STAGE_DIMENSIONS.height - height * y))
 }
 
 const handleMouseEnter = () => store.dispatch('workspaceStore/updateCursor', 'pointer')

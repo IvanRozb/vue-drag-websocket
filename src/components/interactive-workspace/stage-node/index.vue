@@ -4,6 +4,7 @@ import type { KonvaMouseDownEvent, KonvaNode, KonvaStage } from '@/types/konva'
 import GroupNode from '@/components/interactive-workspace/stage-node/group-node/index.vue'
 import TransformerNode from '@/components/interactive-workspace/stage-node/transformer-node.vue'
 import { useStore } from '@/store'
+import { STAGE_DIMENSIONS } from '@/constants/workspace'
 
 const store = useStore()
 
@@ -43,7 +44,7 @@ const handleStageMouseDown = (e: KonvaMouseDownEvent) => {
 <template>
   <v-stage
     ref="stageRef"
-    :config="{ ...store.state.workspaceStore.stageDimensions }"
+    :config="{ ...STAGE_DIMENSIONS }"
     @mousedown="handleStageMouseDown"
     @touchstart="handleStageMouseDown"
   >

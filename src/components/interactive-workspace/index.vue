@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import InfoRestore from '@/components/interactive-workspace/restore.vue'
 import InfoAgenda from '@/components/interactive-workspace/agenda.vue'
-import { useStore } from '@/store'
 import StageNode from '@/components/interactive-workspace/stage-node/index.vue'
-
-const store = useStore()
+import { STEP } from '@/constants/workspace'
 </script>
 
 <template>
-  <div class="interactive-workspace" :style="{ '--step': `${store.state.workspaceStore.step}px` }">
+  <div class="interactive-workspace" :style="{ '--step': `${STEP}px` }">
     <info-restore class="info" />
     <stage-node />
     <info-agenda class="info" />

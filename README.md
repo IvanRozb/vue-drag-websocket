@@ -21,10 +21,22 @@ npm run dev
 npm run build
 ```
 
+### Type check
+
+```sh
+npm run type-check
+```
+
 ### Lint with [ESLint](https://eslint.org/)
 
 ```sh
 npm run lint
+```
+
+### Format with [Prettier](https://prettier.io/)
+
+```sh
+npm run format
 ```
 
 ## Interactive workspace
@@ -57,7 +69,7 @@ And other algorithms are implemented such as removing, restoring the item from a
 ### Libraries/resources used:
 - ```websocket-ts``` - provide typescript version of build-in WebSocket
 - [Blockchain WebSocket API](https://www.blockchain.com/explorer/api/api_websocket) - the API used for getting unsubscribed transactions data
-- ```vuex``` - the library that provides state-management solution
+- ```vuex``` - one of the most popular state-management library for Vue
 
 ### Algorithms and Data Structures
 In this section I used only an array as the only data structure as the user need to see only the list of transactions.

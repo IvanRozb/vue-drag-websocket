@@ -1,6 +1,6 @@
 import { type Module } from 'vuex'
 import type { KonvaStage, KonvaTransformer } from '@/types/konva'
-import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
+import type { IBlock } from '@/interfaces/IBlock'
 import Konva from 'konva'
 import { getLocalStorageItem } from '@/utils/localStorage'
 import type { IState } from '@/store'

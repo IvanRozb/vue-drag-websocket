@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import TextNode from '@/components/interactive-workspace/stage-node/group-node/text-node.vue'
-import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
+import type { IBlock } from '@/interfaces/IBlock'
 import type { KonvaDragEvent, KonvaTransformEvent } from '@/types/konva'
-import { saveTextNodeScale } from '@/components/interactive-workspace/interfaces/saveTextNodeScale'
+import { saveTextNodeScale } from '@/components/interactive-workspace/helpers/saveTextNodeScale'
 import { useStore } from '@/store'
 import RectNode from '@/components/interactive-workspace/stage-node/group-node/rect-node.vue'
 import { STAGE_DIMENSIONS, DISCRETE_UNIT } from '@/constants/workspace'

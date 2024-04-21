@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
+import type { IBlock } from '@/interfaces/IBlock'
 
 defineProps<{
   block: IBlock

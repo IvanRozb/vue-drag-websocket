@@ -1,5 +1,5 @@
 import type { KonvaStage, KonvaTransformer } from '@/types/konva'
-import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
+import type { IBlock } from '@/interfaces/IBlock'
 import { setLocalStorageItem } from '@/utils/localStorage'
 import type { IWorkspaceState } from '@/store/modules/workspace/index'
 

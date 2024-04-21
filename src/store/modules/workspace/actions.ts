@@ -1,6 +1,6 @@
 import type { ActionContext } from 'vuex'
 import type { IState } from '@/store'
-import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
+import type { IBlock } from '@/interfaces/IBlock'
 import { getLocalStorageItem } from '@/utils/localStorage'
 import type { IWorkspaceState } from '@/store/modules/workspace/index'
 import { DEFAULT_ITEM, STAGE_DIMENSIONS } from '@/constants/workspace'

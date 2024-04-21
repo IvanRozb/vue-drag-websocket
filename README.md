@@ -30,8 +30,9 @@ npm run lint
 ## Interactive workspace
 
 ### Libraries/resources used:
-- vue-konva/konva - the library that provides system for handling interactive movement, resizing of blocks. One of the most popular libraries for canvas handling.
-- localstorage - the build-in solution that provides the way to store the data, so it would be restores if browser is closed/updated
+- ```vue-konva/konva``` - the library that provides system for handling interactive movement, resizing of blocks. One of the most popular libraries for canvas handling.
+- ```localstorage``` - the build-in solution that provides the way to store the data, so it would be restores if browser is closed/updated
+- ```vuex``` - one of the most popular state-management library for Vue
 
 ### Algorithms and Data Structures
 In this section I used an array as the main data structure as it stores the data about list of blocks which user interacts with.
@@ -43,10 +44,7 @@ Instead, when user selects the block I manually removing this block from an arra
 Because this array is reactive, the DOM is updating too, rendering the block first and making an effect of changing layers.
 <br/>
 <br/>
-Also, the transforms are all made by step(default: 50) in Konva, so each transformation is rounded by that step.
-<br/>
-<br/>
-Also, event-delegation pattern is used(```getTargetNodeByClassName``` util), since placing to each block an event would be expensive.
+Also, the transforms are all made by ```DISCRETE_UNIT```(default: 50) in Konva, so each transformation is rounded by that unit.
 <br/>
 <br/>
 Setting and getting by key from localstorage is also implemented.
@@ -57,8 +55,9 @@ And other algorithms are implemented such as removing, restoring the item from a
 ## Interaction with the server using the WebSocket protocol
 
 ### Libraries/resources used:
-- websocket-ts - provide typescript version of build-in WebSocket
+- ```websocket-ts``` - provide typescript version of build-in WebSocket
 - [Blockchain WebSocket API](https://www.blockchain.com/explorer/api/api_websocket) - the API used for getting unsubscribed transactions data
+- ```vuex``` - the library that provides state-management solution
 
 ### Algorithms and Data Structures
 In this section I used only an array as the only data structure as the user need to see only the list of transactions.

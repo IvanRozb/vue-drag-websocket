@@ -10,8 +10,6 @@ export const mutations: IMutationTree<IWorkspaceState> = {
     state.items = generateDefaultItems()
     state.lastDeletedItem = null
 
-    console.log('here')
-
     setLocalStorageItem('items', state.items)
     setLocalStorageItem('last-deleted-item', state.lastDeletedItem)
   },

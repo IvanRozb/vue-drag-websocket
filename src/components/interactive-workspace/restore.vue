@@ -5,6 +5,7 @@ const store = useStore()
 
 const restoreLastDeletedItem = () => {
   store.dispatch('workspaceStore/restoreDeletedItem')
+  store.dispatch('workspaceStore/updateTransformNodes', '-1')
 }
 </script>
 
@@ -41,4 +42,3 @@ const restoreLastDeletedItem = () => {
   }
 }
 </style>
-<script setup lang="ts"></script>

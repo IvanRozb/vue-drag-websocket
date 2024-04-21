@@ -6,7 +6,7 @@ import { getLocalStorageItem } from '@/utils/localStorage'
 import type { IState } from '@/store'
 import { mutations } from '@/store/modules/workspace/mutatios'
 import { actions } from '@/store/modules/workspace/actions'
-import { DEFAULT_ITEM, STEP } from '@/constants/workspace'
+import { DEFAULT_ITEM, DISCRETE_UNIT } from '@/constants/workspace'
 
 export interface IWorkspaceState {
   stageRef: KonvaStage | null
@@ -20,8 +20,11 @@ const generateItems = (defaultItem: Partial<IBlock>): IBlock[] =>
     (_, index) =>
       ({
         ...defaultItem,
-        x: defaultItem.x! + (index % 3) * (STEP + defaultItem.width!) + STEP,
-        y: defaultItem.y! + (STEP + defaultItem.height!) * Math.floor(index / 3) + STEP,
+        x: defaultItem.x! + (index % 3) * (DISCRETE_UNIT + defaultItem.width!) + DISCRETE_UNIT,
+        y:
+          defaultItem.y! +
+          (DISCRETE_UNIT + defaultItem.height!) * Math.floor(index / 3) +
+          DISCRETE_UNIT,
         id: 'node-' + index,
         text: (index + 1).toString(),
         fill: Konva.Util.getRandomColor()

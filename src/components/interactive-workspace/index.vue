@@ -2,11 +2,11 @@
 import InfoRestore from '@/components/interactive-workspace/restore.vue'
 import InfoAgenda from '@/components/interactive-workspace/agenda.vue'
 import StageNode from '@/components/interactive-workspace/stage-node/index.vue'
-import { STEP } from '@/constants/workspace'
+import { DISCRETE_UNIT } from '@/constants/workspace'
 </script>
 
 <template>
-  <div class="interactive-workspace" :style="{ '--step': `${STEP}px` }">
+  <div class="interactive-workspace" :style="{ '--step': `${DISCRETE_UNIT}px` }">
     <info-restore class="info" />
     <stage-node />
     <info-agenda class="info" />

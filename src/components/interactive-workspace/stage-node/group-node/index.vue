@@ -5,7 +5,7 @@ import type { KonvaDragEvent, KonvaTransformEvent } from '@/types/konva'
 import { saveTextNodeScale } from '@/components/interactive-workspace/interfaces/saveTextNodeScale'
 import { useStore } from '@/store'
 import RectNode from '@/components/interactive-workspace/stage-node/group-node/rect-node.vue'
-import { STAGE_DIMENSIONS, STEP } from '@/constants/workspace'
+import { STAGE_DIMENSIONS, DISCRETE_UNIT } from '@/constants/workspace'
 
 defineProps<{
   block: IBlock
@@ -37,7 +37,7 @@ const handleDrag = (e: KonvaDragEvent) => {
   const target = e.target
 
   const calculateNextStepValue = (value: number) => {
-    return Math.round(value / STEP) * STEP
+    return Math.round(value / DISCRETE_UNIT) * DISCRETE_UNIT
   }
 
   const [newX, newY] = [target.x(), target.y()].map(calculateNextStepValue)

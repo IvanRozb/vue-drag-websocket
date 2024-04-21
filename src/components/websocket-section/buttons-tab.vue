@@ -1,23 +1,39 @@
 <script setup lang="ts">
 import UiButton from '@/components/ui/button.vue'
+import { useStore } from '@/store'
 
-defineProps<{
-  startWebSocket: (e: MouseEvent) => void
-  stopWebSocket: (e: MouseEvent) => void
-  reset: (e: MouseEvent) => void
-  isWebSocketOpen: boolean
-}>()
+const store = useStore()
+
+const handleStart = () => {
+  store.dispatch('websocketStore/startWebSocket')
+}
+
+const handleStop = () => {
+  store.dispatch('websocketStore/stopWebSocket')
+}
+
+const handleReset = () => {
+  store.dispatch('websocketStore/reset')
+}
 </script>
 
 <template>
   <div class="buttons">
-    <ui-button class="button-start" @click="startWebSocket" :disabled="isWebSocketOpen">
+    <ui-button
+      class="button-start"
+      @click="handleStart"
+      :disabled="store.state.websocketStore.isWebSocketOpen"
+    >
       Start
     </ui-button>
-    <ui-button class="button-stop" @click="stopWebSocket" :disabled="!isWebSocketOpen">
+    <ui-button
+      class="button-stop"
+      @click="handleStop"
+      :disabled="!store.state.websocketStore.isWebSocketOpen"
+    >
       Stop
     </ui-button>
-    <ui-button class="button-reset" @click="reset">Reset</ui-button>
+    <ui-button class="button-reset" @click="handleReset">Reset</ui-button>
   </div>
 </template>
 

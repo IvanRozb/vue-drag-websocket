@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import type { KonvaTransformer } from '@/types/konva'
 import { useStore } from '@/store'
-import { STAGE_DIMENSIONS, STEP } from '@/constants/workspace'
+import { STAGE_DIMENSIONS, DISCRETE_UNIT } from '@/constants/workspace'
 import type { IDimensions } from '@/interfaces/IDimensions'
 
 interface IBox extends IDimensions {
@@ -18,7 +18,7 @@ onMounted(() => {
 })
 
 const getTransformBox = (oldBoundBox: IBox, newBoundBox: IBox) => {
-  if (Math.abs(newBoundBox.width) < STEP || Math.abs(newBoundBox.height) < STEP) {
+  if (Math.abs(newBoundBox.width) < DISCRETE_UNIT || Math.abs(newBoundBox.height) < DISCRETE_UNIT) {
     return oldBoundBox
   }
 
@@ -27,10 +27,10 @@ const getTransformBox = (oldBoundBox: IBox, newBoundBox: IBox) => {
   const fillBoxProp = (dimension: keyof IBox) => {
     const diffX = Math.abs(oldBoundBox[dimension] - newBoundBox[dimension])
 
-    if (diffX < STEP) res[dimension] = oldBoundBox[dimension]
+    if (diffX < DISCRETE_UNIT) res[dimension] = oldBoundBox[dimension]
     else res[dimension] = newBoundBox[dimension]
 
-    res[dimension] = Math.round(res[dimension] / STEP) * STEP
+    res[dimension] = Math.round(res[dimension] / DISCRETE_UNIT) * DISCRETE_UNIT
   }
 
   const boxProps: (keyof IBox)[] = ['width', 'height', 'x', 'y']

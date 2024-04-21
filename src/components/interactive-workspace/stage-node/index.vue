@@ -10,7 +10,7 @@ const store = useStore()
 const stageRef = ref<KonvaStage | null>(null)
 
 onMounted(() => {
-  store.dispatch('workspaceStore/updateStageRef', stageRef.value)
+  store.commit('workspaceStore/setStageRef', stageRef.value)
 })
 
 const getTargetGroup = (targetNode: KonvaNode) => {

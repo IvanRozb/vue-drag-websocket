@@ -73,18 +73,6 @@ export const workspaceStore: Module<IWorkspaceState, IState> = {
     }
   },
   actions: {
-    updateStageRef({ commit }: ActionContext<IWorkspaceState, IState>, stageRef: KonvaStage) {
-      commit('setStageRef', stageRef)
-    },
-    updateTransformerRef(
-      { commit }: ActionContext<IWorkspaceState, IState>,
-      transformerRef: KonvaTransformer
-    ) {
-      commit('setTransformerRef', transformerRef)
-    },
-    updateItems({ commit }: ActionContext<IWorkspaceState, IState>, items: IBlock[]) {
-      commit('setItems', items)
-    },
     updateItemById(
       { commit, state }: ActionContext<IWorkspaceState, IState>,
       payload: { id: string; newItem: Partial<IBlock> }

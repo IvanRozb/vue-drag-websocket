@@ -13,7 +13,6 @@ const store = useStore()
     <stage-node />
     <info-agenda class="info" />
   </div>
-  1
 </template>
 
 <style scoped lang="scss">

@@ -8,7 +8,7 @@ const store = useStore()
 const transformerRef = ref<KonvaTransformer | null>(null)
 
 onMounted(() => {
-  store.dispatch('workspaceStore/updateTransformerRef', transformerRef.value)
+  store.commit('workspaceStore/setTransformerRef', transformerRef.value)
 })
 
 const getTransformBox = (

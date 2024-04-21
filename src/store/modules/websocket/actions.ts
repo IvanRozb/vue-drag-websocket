@@ -3,10 +3,11 @@ import type { IState } from '@/store'
 import { WebsocketBuilder } from 'websocket-ts'
 import type { IWebSocketState } from '@/store/modules/websocket/index'
 import type { IActionTree } from '@/interfaces/IActionTree'
+import { WEBSOCKET_CONNECTION_URL } from '@/constants/websocket'
 
 export const actions: IActionTree<IWebSocketState, IState> = {
   startWebSocket({ commit }: ActionContext<IWebSocketState, IState>) {
-    const ws = new WebsocketBuilder('wss://ws.blockchain.info/inv')
+    const ws = new WebsocketBuilder(WEBSOCKET_CONNECTION_URL)
       .onOpen(() => {
         console.log('WebSocket connection opened!')
         commit('setIsWebsocketOpen', true)

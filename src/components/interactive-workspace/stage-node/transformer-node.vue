@@ -2,13 +2,13 @@
 import type { IBox, IDimensions } from '@/components/interactive-workspace/interfaces/IBox'
 import { onMounted, ref } from 'vue'
 import type { KonvaTransformer } from '@/types/konva'
-import { useWorkspaceStore } from '@/store/workspace'
+import { useStore } from '@/store'
 
-const workspaceStore = useWorkspaceStore()
+const store = useStore()
 const transformerRef = ref<KonvaTransformer | null>(null)
 
 onMounted(() => {
-  workspaceStore.dispatch('updateTransformerRef', transformerRef.value)
+  store.dispatch('workspaceStore/updateTransformerRef', transformerRef.value)
 })
 
 const getTransformBox = (
@@ -54,8 +54,8 @@ const handleBoundBox = (oldBox: IBox, newBox: IBox) => {
   return getTransformBox(
     oldBox,
     newBox,
-    workspaceStore.state.step,
-    workspaceStore.state.stageDimensions
+    store.state.workspaceStore.step,
+    store.state.workspaceStore.stageDimensions
   )
 }
 </script>

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { useWorkspaceStore } from '@/store/workspace'
+import { useStore } from '@/store'
 
-const workspaceStore = useWorkspaceStore()
+const store = useStore()
 
 const restoreLastDeletedItem = () => {
-  workspaceStore.dispatch('restoreDeletedItem')
+  store.dispatch('workspaceStore/restoreDeletedItem')
 }
 </script>
 
 <template>
   <svg
-    v-if="workspaceStore.state.lastDeletedItem"
+    v-if="store.state.workspaceStore.lastDeletedItem"
     @click="restoreLastDeletedItem"
     class="restore"
     xmlns="http://www.w3.org/2000/svg"

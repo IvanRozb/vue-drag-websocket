@@ -3,27 +3,27 @@ import TextNode from '@/components/interactive-workspace/stage-node/group-node/t
 import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
 import type { KonvaDragEvent, KonvaTransformEvent } from '@/types/konva'
 import { saveTextNodeScale } from '@/components/interactive-workspace/interfaces/saveTextNodeScale'
-import { useWorkspaceStore } from '@/store/workspace'
+import { useStore } from '@/store'
 import RectNode from '@/components/interactive-workspace/stage-node/group-node/rect-node.vue'
 
 defineProps<{
   block: IBlock
 }>()
 
-const workspaceStore = useWorkspaceStore()
+const store = useStore()
 
 const handleDragStart = (e: KonvaDragEvent) => {
-  workspaceStore.dispatch('updateCursor', 'grab')
+  store.dispatch('workspaceStore/updateCursor', 'grab')
 
   const group = e.target
-  workspaceStore.dispatch('moveItemToFirstIndex', group.id())
+  store.dispatch('workspaceStore/moveItemToFirstIndex', group.id())
 }
 
 const handleDragEnd = (e: KonvaDragEvent) => {
   const target = e.target
   const draggedItemId = target.id()
 
-  workspaceStore.dispatch('updateItemById', {
+  store.dispatch('workspaceStore/updateItemById', {
     id: draggedItemId,
     newItem: {
       x: target.x(),
@@ -36,7 +36,7 @@ const handleDrag = (e: KonvaDragEvent) => {
   const target = e.target
 
   const calculateNextStepValue = (value: number) => {
-    return Math.round(value / workspaceStore.state.step) * workspaceStore.state.step
+    return Math.round(value / store.state.workspaceStore.step) * store.state.workspaceStore.step
   }
 
   const [newX, newY] = [target.x(), target.y()].map(calculateNextStepValue)
@@ -46,12 +46,16 @@ const handleDrag = (e: KonvaDragEvent) => {
   } = target.findOne('#' + target.id() + '-rect')
   const { x, y } = target.getAbsoluteScale()
 
-  target.x(Math.min(Math.max(newX, 0), workspaceStore.state.stageDimensions.width - width * x))
-  target.y(Math.min(Math.max(newY, 0), workspaceStore.state.stageDimensions.height - height * y))
+  target.x(
+    Math.min(Math.max(newX, 0), store.state.workspaceStore.stageDimensions.width - width * x)
+  )
+  target.y(
+    Math.min(Math.max(newY, 0), store.state.workspaceStore.stageDimensions.height - height * y)
+  )
 }
 
-const handleMouseEnter = () => workspaceStore.dispatch('updateCursor', 'pointer')
-const handleMouseLeave = () => workspaceStore.dispatch('updateCursor', 'default')
+const handleMouseEnter = () => store.dispatch('workspaceStore/updateCursor', 'pointer')
+const handleMouseLeave = () => store.dispatch('workspaceStore/updateCursor', 'default')
 
 const handleTransform = (e: KonvaTransformEvent) => {
   const target = e.target
@@ -67,7 +71,7 @@ const handleTransformEnd = (e: KonvaTransformEvent) => {
   const target = e.target
   const draggedItemId = target.id()
 
-  workspaceStore.dispatch('updateItemById', {
+  store.dispatch('workspaceStore/updateItemById', {
     id: draggedItemId,
     newItem: {
       x: target.x(),
@@ -79,9 +83,9 @@ const handleTransformEnd = (e: KonvaTransformEvent) => {
 }
 
 const handleDoubleClick = (groupId: string) => {
-  workspaceStore.dispatch('removeItemById', groupId)
-  workspaceStore.dispatch('updateTransformNodes', '-1')
-  workspaceStore.dispatch('updateCursor', 'default')
+  store.dispatch('workspaceStore/removeItemById', groupId)
+  store.dispatch('workspaceStore/updateTransformNodes', '-1')
+  store.dispatch('workspaceStore/updateCursor', 'default')
 }
 </script>
 

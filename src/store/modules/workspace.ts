@@ -1,12 +1,12 @@
-import { type InjectionKey } from 'vue'
-import { createStore, useStore as baseUseStore, Store, type ActionContext } from 'vuex'
+import { type ActionContext, type Module } from 'vuex'
 import type { KonvaStage, KonvaTransformer } from '@/types/konva'
 import type { IBlock } from '@/components/interactive-workspace/interfaces/IBlock'
 import type { IDimensions } from '@/components/interactive-workspace/interfaces/IBox'
 import Konva from 'konva'
 import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorage'
+import type { IState } from '@/store'
 
-export interface IState {
+export interface IWorkspaceState {
   stageRef: KonvaStage | null
   transformerRef: KonvaTransformer | null
   items: IBlock[]
@@ -38,13 +38,14 @@ const generateItems = (defaultItem: Partial<IBlock>): IBlock[] =>
       }) as IBlock
   )
 
-export const key: InjectionKey<Store<IState>> = Symbol()
+const getItems = () => getLocalStorageItem<IBlock[]>('items') ?? generateItems(defaultItem)
 
-export const workspaceStore = createStore<IState>({
+export const workspaceStore: Module<IWorkspaceState, IState> = {
+  namespaced: true,
   state: {
     stageRef: null,
     transformerRef: null,
-    items: getLocalStorageItem<IBlock[]>('items') ?? generateItems(defaultItem),
+    items: getItems(),
     step,
     stageDimensions: {
       width: window.innerWidth,
@@ -56,36 +57,36 @@ export const workspaceStore = createStore<IState>({
     }>('last-deleted-item')
   },
   mutations: {
-    setStageRef(state: IState, stageRef: KonvaStage) {
+    setStageRef(state: IWorkspaceState, stageRef: KonvaStage) {
       state.stageRef = stageRef
     },
-    setTransformerRef(state: IState, transformerRef: KonvaTransformer) {
+    setTransformerRef(state: IWorkspaceState, transformerRef: KonvaTransformer) {
       state.transformerRef = transformerRef
     },
-    setItems(state: IState, items: IBlock[]) {
+    setItems(state: IWorkspaceState, items: IBlock[]) {
       state.items = items
       setLocalStorageItem('items', items)
     },
-    setLastDeletedItem(state: IState, item: { item: IBlock; index: number } | null) {
+    setLastDeletedItem(state: IWorkspaceState, item: { item: IBlock; index: number } | null) {
       state.lastDeletedItem = item
       setLocalStorageItem('last-deleted-item', item)
     }
   },
   actions: {
-    updateStageRef({ commit }: ActionContext<IState, IState>, stageRef: KonvaStage) {
+    updateStageRef({ commit }: ActionContext<IWorkspaceState, IState>, stageRef: KonvaStage) {
       commit('setStageRef', stageRef)
     },
     updateTransformerRef(
-      { commit }: ActionContext<IState, IState>,
+      { commit }: ActionContext<IWorkspaceState, IState>,
       transformerRef: KonvaTransformer
     ) {
       commit('setTransformerRef', transformerRef)
     },
-    updateItems({ commit }: ActionContext<IState, IState>, items: IBlock[]) {
+    updateItems({ commit }: ActionContext<IWorkspaceState, IState>, items: IBlock[]) {
       commit('setItems', items)
     },
     updateItemById(
-      { commit, state }: ActionContext<IState, IState>,
+      { commit, state }: ActionContext<IWorkspaceState, IState>,
       payload: { id: string; newItem: Partial<IBlock> }
     ) {
       const { items } = state
@@ -99,7 +100,7 @@ export const workspaceStore = createStore<IState>({
 
       commit('setItems', updatedItems)
     },
-    moveItemToFirstIndex({ commit, state }: ActionContext<IState, IState>, id: string) {
+    moveItemToFirstIndex({ commit, state }: ActionContext<IWorkspaceState, IState>, id: string) {
       const { items } = state
 
       const item = items.find((i) => i.id === id)
@@ -112,7 +113,7 @@ export const workspaceStore = createStore<IState>({
 
       commit('setItems', updatedItems)
     },
-    removeItemById({ commit, state }: ActionContext<IState, IState>, id: string) {
+    removeItemById({ commit, state }: ActionContext<IWorkspaceState, IState>, id: string) {
       const { items } = state
       const index = items.findIndex((item) => item.id === id)
       if (index === -1) return
@@ -124,7 +125,7 @@ export const workspaceStore = createStore<IState>({
       commit('setItems', updatedItems)
       commit('setLastDeletedItem', lastDeletedItem)
     },
-    restoreDeletedItem({ commit, state }: ActionContext<IState, IState>) {
+    restoreDeletedItem({ commit, state }: ActionContext<IWorkspaceState, IState>) {
       const lastDeletedItem = getLocalStorageItem<{ item: IBlock; index: number }>(
         'last-deleted-item'
       )
@@ -146,7 +147,7 @@ export const workspaceStore = createStore<IState>({
       commit('setItems', updatedItems)
       commit('setLastDeletedItem', null)
     },
-    updateTransformNodes({ state }: ActionContext<IState, IState>, id: string) {
+    updateTransformNodes({ state }: ActionContext<IWorkspaceState, IState>, id: string) {
       const { transformerRef } = state
       if (!transformerRef) return
       const transformerNode = transformerRef.getNode()
@@ -167,7 +168,7 @@ export const workspaceStore = createStore<IState>({
         transformerNode.nodes([])
       }
     },
-    updateCursor({ state }: ActionContext<IState, IState>, cursor: string) {
+    updateCursor({ state }: ActionContext<IWorkspaceState, IState>, cursor: string) {
       const { stageRef } = state
       if (!stageRef) return
 
@@ -175,8 +176,4 @@ export const workspaceStore = createStore<IState>({
       styles.cursor = cursor
     }
   }
-})
-
-export function useWorkspaceStore() {
-  return baseUseStore(key)
 }

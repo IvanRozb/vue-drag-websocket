@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import InteractiveWorkspaceInfoRestore from '@/components/interactive-workspace/restore.vue'
-import InteractiveWorkspaceInfoAgenda from '@/components/interactive-workspace/agenda.vue'
-import { useWorkspaceStore } from '@/store/workspace'
+import InfoRestore from '@/components/interactive-workspace/restore.vue'
+import InfoAgenda from '@/components/interactive-workspace/agenda.vue'
+import { useStore } from '@/store'
 import StageNode from '@/components/interactive-workspace/stage-node/index.vue'
 
-const workspaceStore = useWorkspaceStore()
+const store = useStore()
 </script>
 
 <template>
-  <div class="interactive-workspace" :style="{ '--step': `${workspaceStore.state.step}px` }">
-    <interactive-workspace-info-restore class="info" />
+  <div class="interactive-workspace" :style="{ '--step': `${store.state.workspaceStore.step}px` }">
+    <info-restore class="info" />
     <stage-node />
-    <interactive-workspace-info-agenda class="info" />
+    <info-agenda class="info" />
   </div>
+  1
 </template>
 
 <style scoped lang="scss">

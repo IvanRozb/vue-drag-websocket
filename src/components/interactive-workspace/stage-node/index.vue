@@ -3,14 +3,14 @@ import { onMounted, ref } from 'vue'
 import type { KonvaMouseDownEvent, KonvaNode, KonvaStage } from '@/types/konva'
 import GroupNode from '@/components/interactive-workspace/stage-node/group-node/index.vue'
 import TransformerNode from '@/components/interactive-workspace/stage-node/transformer-node.vue'
-import { useWorkspaceStore } from '@/store/workspace'
+import { useStore } from '@/store'
 
-const workspaceStore = useWorkspaceStore()
+const store = useStore()
 
 const stageRef = ref<KonvaStage | null>(null)
 
 onMounted(() => {
-  workspaceStore.dispatch('updateStageRef', stageRef.value)
+  store.dispatch('workspaceStore/updateStageRef', stageRef.value)
 })
 
 const getTargetGroup = (targetNode: KonvaNode) => {
@@ -23,7 +23,7 @@ const getTargetGroup = (targetNode: KonvaNode) => {
 
 const handleStageMouseDown = (e: KonvaMouseDownEvent) => {
   if (e.target === e.target.getStage()) {
-    workspaceStore.dispatch('updateTransformNodes', '-1')
+    store.dispatch('workspaceStore/updateTransformNodes', '-1')
     return
   }
 
@@ -33,22 +33,26 @@ const handleStageMouseDown = (e: KonvaMouseDownEvent) => {
   const target = getTargetGroup(e.target)
   const id = target.id()
 
-  workspaceStore.dispatch('moveItemToFirstIndex', id)
+  store.dispatch('workspaceStore/moveItemToFirstIndex', id)
 
-  const rect = workspaceStore.state.items.find((r) => r.id === id)
-  workspaceStore.dispatch('updateTransformNodes', rect ? id : '-1')
+  const rect = store.state.workspaceStore.items.find((r) => r.id === id)
+  store.dispatch('workspaceStore/updateTransformNodes', rect ? id : '-1')
 }
 </script>
 
 <template>
   <v-stage
     ref="stageRef"
-    :config="{ ...workspaceStore.state.stageDimensions }"
+    :config="{ ...store.state.workspaceStore.stageDimensions }"
     @mousedown="handleStageMouseDown"
     @touchstart="handleStageMouseDown"
   >
     <v-layer>
-      <group-node :block="block" :key="block.id" v-for="block in workspaceStore.state.items" />
+      <group-node
+        :block="block"
+        :key="block.id"
+        v-for="block in store.state.workspaceStore.items"
+      />
       <transformer-node />
     </v-layer>
   </v-stage>

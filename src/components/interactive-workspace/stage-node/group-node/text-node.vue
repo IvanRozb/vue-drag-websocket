@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import type { KonvaText } from '@/types/konva'
-import { saveTextNodeScale } from '@/components/interactive-workspace/interfaces/saveTextNodeScale'
+import { saveTextNodeScale } from '@/components/interactive-workspace/helpers/saveTextNodeScale'
 
 defineProps<{
   id: string

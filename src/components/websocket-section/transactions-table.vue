@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import type { ITransaction } from '@/components/websocket-section/interfaces/ITransaction'
+import { useStore } from '@/store'
 
-defineProps<{
-  transactions: ITransaction[]
-  totalAmount: number
-}>()
+const store = useStore()
 </script>
 
 <template>
-  <h3 class="total">Total: {{ totalAmount.toFixed(8) }} BTC</h3>
+  <h3 class="total">Total: {{ store.state.websocketStore.totalAmount.toFixed(8) }} BTC</h3>
   <table class="table">
     <thead>
       <tr>
@@ -18,7 +15,7 @@ defineProps<{
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(transaction, index) in transactions" :key="index">
+      <tr v-for="(transaction, index) in store.state.websocketStore.transactions" :key="index">
         <td>{{ transaction.sender }}</td>
         <td>{{ transaction.recipient }}</td>
         <td>{{ transaction.amount.toFixed(8) }}</td>

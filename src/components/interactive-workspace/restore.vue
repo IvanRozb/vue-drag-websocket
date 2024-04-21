@@ -1,5 +1,21 @@
+<script setup lang="ts">
+import { useStore } from '@/store'
+
+const store = useStore()
+
+const restoreLastDeletedItem = () => {
+  store.dispatch('workspaceStore/restoreDeletedItem')
+}
+</script>
+
 <template>
-  <svg class="restore" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <svg
+    v-if="store.state.workspaceStore.lastDeletedItem"
+    @click="restoreLastDeletedItem"
+    class="restore"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 48 48"
+  >
     <path d="M0 0h48v48H0z" fill="none" />
     <g id="Shopicon">
       <path
@@ -25,3 +41,4 @@
   }
 }
 </style>
+<script setup lang="ts"></script>

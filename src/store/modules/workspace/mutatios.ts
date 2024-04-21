@@ -2,8 +2,9 @@ import type { KonvaStage, KonvaTransformer } from '@/types/konva'
 import type { IBlock } from '@/interfaces/IBlock'
 import { setLocalStorageItem } from '@/utils/localStorage'
 import type { IWorkspaceState } from '@/store/modules/workspace/index'
+import type { IMutationTree } from '@/interfaces/IMutationTree'
 
-export const mutations = {
+export const mutations: IMutationTree<IWorkspaceState> = {
   setStageRef(state: IWorkspaceState, stageRef: KonvaStage) {
     state.stageRef = stageRef
   },

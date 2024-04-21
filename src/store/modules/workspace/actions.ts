@@ -4,8 +4,9 @@ import type { IBlock } from '@/interfaces/IBlock'
 import { getLocalStorageItem } from '@/utils/localStorage'
 import type { IWorkspaceState } from '@/store/modules/workspace/index'
 import { DEFAULT_ITEM, STAGE_DIMENSIONS } from '@/constants/workspace'
+import type { IActionTree } from '@/interfaces/IActionTree'
 
-export const actions = {
+export const actions: IActionTree<IWorkspaceState, IState> = {
   updateItemById(
     { commit, state }: ActionContext<IWorkspaceState, IState>,
     payload: { id: string; newItem: Partial<IBlock> }

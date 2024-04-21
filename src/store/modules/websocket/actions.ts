@@ -2,8 +2,9 @@ import type { ActionContext } from 'vuex'
 import type { IState } from '@/store'
 import { WebsocketBuilder } from 'websocket-ts'
 import type { IWebSocketState } from '@/store/modules/websocket/index'
+import type { IActionTree } from '@/interfaces/IActionTree'
 
-export const actions = {
+export const actions: IActionTree<IWebSocketState, IState> = {
   startWebSocket({ commit }: ActionContext<IWebSocketState, IState>) {
     const ws = new WebsocketBuilder('wss://ws.blockchain.info/inv')
       .onOpen(() => {

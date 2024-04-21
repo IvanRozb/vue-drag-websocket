@@ -1,8 +1,9 @@
 import { Websocket } from 'websocket-ts'
 import type { ITransaction } from '@/interfaces/ITransaction'
 import type { IWebSocketState } from '@/store/modules/websocket/index'
+import type { IMutationTree } from '@/interfaces/IMutationTree'
 
-export const mutations = {
+export const mutations: IMutationTree<IWebSocketState> = {
   setWebsocket(state: IWebSocketState, ws: Websocket) {
     state.ws = ws
   },
